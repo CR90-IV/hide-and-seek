@@ -29,6 +29,49 @@
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
+        /* Overview icon styles */
+        .overview-icon-used {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Direct icon shape coloring for overview and history */
+        .icon-shape.matching-card,
+        .matching-card .icon-shape {
+            background-color: #1C3F94;
+            color: white;
+        }
+
+        .icon-shape.measuring-card,
+        .measuring-card .icon-shape {
+            background-color: #009B3A;
+            color: white;
+        }
+
+        .icon-shape.radar-card,
+        .radar-card .icon-shape {
+            background-color: #EE352E;
+            color: white;
+        }
+
+        .icon-shape.thermometer-card,
+        .thermometer-card .icon-shape {
+            background-color: #FCCC0A;
+            color: #000;
+        }
+
+        .icon-shape.tentacle-card,
+        .tentacle-card .icon-shape {
+            background-color: #6D28D9;
+            color: white;
+        }
+
+        .icon-shape.photo-card,
+        .photo-card .icon-shape {
+            background-color: #00A9E0;
+            color: white;
+        }
+
         /* Metro line colors - bold and saturated */
         .matching-header {
             background-color: #1C3F94;
@@ -265,17 +308,28 @@
 <body class="bg-gray-50 min-h-screen pb-24">
     <!-- Header -->
     <header class="bg-white border-b-4 border-gray-900 p-4 shadow-sm">
-        <div class="max-w-lg mx-auto flex items-center justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">HIDER CHEAT SHEET</h1>
-                <p class="text-gray-600 text-base mt-1 font-medium">Select your question → Copy to clipboard</p>
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Hide and Seek</h1>
+            <p class="text-gray-600 text-base mt-1 font-medium">Click a question to copy to clipboard</p>
+            <div class="flex gap-2 mt-3">
+                <div class="relative flex-1 max-w-xs">
+                    <select id="view-selector" onchange="switchView(this.value)"
+                        class="w-full bg-white hover:bg-gray-50 border-2 border-gray-300 text-gray-700 px-4 py-2 pr-10 shadow-sm text-sm font-semibold tracking-wide transition-all appearance-none cursor-pointer"
+                        style="border-radius: 4px;">
+                        <option value="detail">DETAIL VIEW</option>
+                        <option value="overview">OVERVIEW</option>
+                        <option value="history">HISTORY</option>
+                    </select>
+                    <span
+                        class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none text-lg">expand_more</span>
+                </div>
+                <button onclick="resetAll()"
+                    class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 shadow-sm text-sm font-semibold tracking-wide transition-all"
+                    style="border-radius: 4px;">
+                    <span class="material-symbols-outlined text-base align-middle mr-1">refresh</span>
+                    RESET
+                </button>
             </div>
-            <button onclick="resetAll()"
-                class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2.5 shadow-sm text-sm font-semibold tracking-wide transition-all flex-shrink-0"
-                style="border-radius: 4px;">
-                <span class="material-symbols-outlined text-lg align-middle mr-1">refresh</span>
-                RESET
-            </button>
         </div>
     </header>
 
@@ -287,22 +341,45 @@
         COPIED TO CLIPBOARD
     </div>
 
-    <main id="questions-container" class="max-w-lg mx-auto p-4 space-y-6">
-        <!-- Questions will be dynamically rendered here -->
+    <main id="normal-view" class="max-w-7xl mx-auto p-4">
+        <div id="questions-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <!-- Questions will be dynamically rendered here -->
+        </div>
+    </main>
+
+    <main id="overview-view" class="max-w-4xl mx-auto p-4 space-y-6 hidden">
+        <!-- Overview grid will be dynamically rendered here -->
+    </main>
+
+    <main id="history-view" class="max-w-4xl mx-auto p-4 hidden">
+        <div class="bg-white border-2 border-gray-300 shadow-sm" style="border-radius: 4px;">
+            <div class="border-b-2 border-gray-300 p-4">
+                <h2 class="text-xl font-bold text-gray-900 uppercase tracking-wide flex items-center">
+                    <span class="material-symbols-outlined mr-2 text-2xl">history</span>
+                    Question History
+                </h2>
+            </div>
+            <div id="history-list" class="p-4">
+                <!-- History items will be rendered here -->
+            </div>
+        </div>
     </main>
 
     <script src="questions-data.js"></script>
     <script>
-        // Load used questions from localStorage
+        // Load used questions and history from localStorage
         const usedQuestions = JSON.parse(localStorage.getItem('usedQuestions') || '[]');
+        const questionHistory = JSON.parse(localStorage.getItem('questionHistory') || '[]');
 
         // Render all questions on page load
         document.addEventListener('DOMContentLoaded', () => {
             renderAllQuestions();
+            renderOverview();
+            renderHistory();
         });
 
         function renderAllQuestions() {
-            const container = document.getElementById('questions-container');
+            const container = document.getElementById('questions-grid');
 
             // Render each category
             for (const [categoryKey, categoryData] of Object.entries(questionsData)) {
@@ -353,6 +430,15 @@
             content.className = 'bg-white border-2 border-t-0 border-gray-200 p-3 space-y-2';
             content.style.borderRadius = '0 0 4px 4px';
 
+            // Add note if exists (at top)
+            if (categoryData.note) {
+                const noteBox = document.createElement('div');
+                noteBox.className = 'bg-yellow-50 border-l-4 border-yellow-400 p-2.5';
+                noteBox.style.borderRadius = '2px';
+                noteBox.innerHTML = `<p class="text-gray-800 text-sm font-medium"><span class="material-symbols-outlined text-base align-middle mr-1">info</span>${categoryData.note}</p>`;
+                content.appendChild(noteBox);
+            }
+
             // Render question groups
             categoryData.questions.forEach(group => {
                 if (group.subcategory) {
@@ -377,15 +463,6 @@
 
                 content.appendChild(itemsContainer);
             });
-
-            // Add note if exists
-            if (categoryData.note) {
-                const noteBox = document.createElement('div');
-                noteBox.className = 'bg-yellow-50 border-l-4 border-yellow-400 p-2.5 mt-3';
-                noteBox.style.borderRadius = '2px';
-                noteBox.innerHTML = `<p class="text-gray-800 text-sm font-medium"><span class="material-symbols-outlined text-base align-middle mr-1">info</span>${categoryData.note}</p>`;
-                content.appendChild(noteBox);
-            }
 
             section.appendChild(content);
             return section;
@@ -535,6 +612,29 @@
         function copyQuestion(card) {
             const category = card.dataset.category;
             const title = card.dataset.title;
+            const key = category + ':' + title;
+
+            // Check if already used - if so, toggle it back to unused
+            if (card.classList.contains('card-used')) {
+                card.classList.remove('card-used');
+
+                // Remove from usedQuestions
+                const index = usedQuestions.indexOf(key);
+                if (index > -1) {
+                    usedQuestions.splice(index, 1);
+                    localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
+                }
+
+                // Also update overview if it exists
+                document.querySelectorAll('.overview-icon').forEach(icon => {
+                    if (icon.dataset.category === category && icon.dataset.title === title) {
+                        icon.classList.remove('overview-icon-used');
+                    }
+                });
+
+                return; // Don't copy to clipboard
+            }
+
             const question = card.dataset.question;
             const answer = card.dataset.answer;
             const note = card.dataset.note;
@@ -555,11 +655,20 @@
                 card.classList.add('card-used');
 
                 // Save to localStorage
-                const key = category + ':' + title;
                 if (!usedQuestions.includes(key)) {
                     usedQuestions.push(key);
                     localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
                 }
+
+                // Add to history
+                questionHistory.push({
+                    category,
+                    title,
+                    question,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('questionHistory', JSON.stringify(questionHistory));
+                renderHistory();
 
                 // Show toast
                 showToast();
@@ -625,6 +734,16 @@
                         usedQuestions.push(key);
                         localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
                     }
+
+                    // Add to history
+                    questionHistory.push({
+                        category,
+                        title,
+                        question,
+                        timestamp: new Date().toISOString()
+                    });
+                    localStorage.setItem('questionHistory', JSON.stringify(questionHistory));
+                    renderHistory();
                 }
 
                 showToast();
@@ -646,7 +765,8 @@
         }
 
         function resetAll() {
-            if (confirm('Reset all questions to unused?')) {
+            if (confirm('Reset all questions and clear history?')) {
+                // Clear used questions
                 localStorage.removeItem('usedQuestions');
                 usedQuestions.length = 0;
                 document.querySelectorAll('.question-card').forEach(card => {
@@ -655,7 +775,224 @@
                 document.querySelectorAll('.thermometer-card').forEach(card => {
                     card.classList.remove('card-used');
                 });
+                document.querySelectorAll('.overview-icon').forEach(icon => {
+                    icon.classList.remove('overview-icon-used');
+                });
+
+                // Clear history
+                localStorage.removeItem('questionHistory');
+                questionHistory.length = 0;
+                renderHistory();
             }
+        }
+
+        function switchView(view) {
+            const normalView = document.getElementById('normal-view');
+            const overviewView = document.getElementById('overview-view');
+            const historyView = document.getElementById('history-view');
+
+            // Hide all views
+            normalView.classList.add('hidden');
+            overviewView.classList.add('hidden');
+            historyView.classList.add('hidden');
+
+            // Show selected view
+            if (view === 'detail') {
+                normalView.classList.remove('hidden');
+            } else if (view === 'overview') {
+                overviewView.classList.remove('hidden');
+            } else if (view === 'history') {
+                historyView.classList.remove('hidden');
+            }
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-list');
+            container.innerHTML = '';
+
+            if (questionHistory.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">No questions asked yet</p>';
+                return;
+            }
+
+            // Show most recent first
+            const reversedHistory = [...questionHistory].reverse();
+
+            reversedHistory.forEach((item, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'border-b border-gray-200 last:border-0 py-3';
+
+                const date = new Date(item.timestamp);
+                const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+
+                // Find the icon and category key for this question
+                let iconName = 'help';
+                let categoryKey = '';
+                for (const [key, data] of Object.entries(questionsData)) {
+                    if (data.title === item.category) {
+                        categoryKey = key;
+                        data.questions.forEach(group => {
+                            group.items.forEach(q => {
+                                if (q.title === item.title) {
+                                    iconName = q.icon;
+                                }
+                            });
+                        });
+                        break;
+                    }
+                }
+
+                historyItem.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="icon-shape ${categoryKey}-card flex-shrink-0">
+                            <span class="material-symbols-outlined text-2xl">${iconName}</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-semibold text-gray-900">${item.category}: ${item.title}</p>
+                            <p class="text-sm text-gray-600 mt-1">${item.question}</p>
+                        </div>
+                        <div class="text-right text-sm text-gray-500 flex-shrink-0">
+                            <div>${timeStr}</div>
+                            <div class="text-xs">${dateStr}</div>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(historyItem);
+            });
+        }
+
+        function renderOverview() {
+            const container = document.getElementById('overview-view');
+
+            for (const [categoryKey, categoryData] of Object.entries(questionsData)) {
+                const section = document.createElement('section');
+
+                // Create header
+                const header = document.createElement('div');
+                header.className = `${categoryKey}-header text-white p-3`;
+                header.style.borderRadius = '4px 4px 0 0';
+                header.innerHTML = `<h2 class="text-lg font-bold tracking-wide uppercase">${categoryData.title}</h2>`;
+                section.appendChild(header);
+
+                // Create grid container
+                const grid = document.createElement('div');
+                grid.className = 'bg-white border-2 border-t-0 border-gray-200 p-3 grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2';
+                grid.style.borderRadius = '0 0 4px 4px';
+
+                // Add all question icons
+                categoryData.questions.forEach(group => {
+                    group.items.forEach(item => {
+                        const iconWrapper = document.createElement('div');
+                        iconWrapper.className = `overview-icon cursor-pointer transition-all flex items-center justify-center`;
+                        iconWrapper.style.aspectRatio = '1';
+                        iconWrapper.title = item.title;
+
+                        // Set data attributes
+                        iconWrapper.dataset.category = categoryData.title;
+                        iconWrapper.dataset.title = item.title;
+                        iconWrapper.dataset.question = item.question;
+                        iconWrapper.dataset.answer = item.answer || categoryData.answer;
+                        iconWrapper.dataset.note = item.note || '';
+                        iconWrapper.dataset.reward = categoryData.reward;
+
+                        // Check if used
+                        const key = categoryData.title + ':' + item.title;
+                        if (usedQuestions.includes(key)) {
+                            iconWrapper.classList.add('overview-icon-used');
+                        }
+
+                        iconWrapper.innerHTML = `
+                            <div class="icon-shape ${categoryKey}-card">
+                                <span class="material-symbols-outlined text-2xl">${item.icon}</span>
+                            </div>
+                        `;
+                        iconWrapper.addEventListener('click', () => copyQuestionFromOverview(iconWrapper));
+
+                        grid.appendChild(iconWrapper);
+                    });
+                });
+
+                section.appendChild(grid);
+                container.appendChild(section);
+            }
+        }
+
+        function copyQuestionFromOverview(iconWrapper) {
+            const category = iconWrapper.dataset.category;
+            const title = iconWrapper.dataset.title;
+            const key = category + ':' + title;
+
+            // Check if already used - if so, toggle it back to unused
+            if (iconWrapper.classList.contains('overview-icon-used')) {
+                iconWrapper.classList.remove('overview-icon-used');
+
+                // Remove from usedQuestions
+                const index = usedQuestions.indexOf(key);
+                if (index > -1) {
+                    usedQuestions.splice(index, 1);
+                    localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
+                }
+
+                // Also update the normal view
+                document.querySelectorAll('.question-card, .thermometer-card').forEach(card => {
+                    if (card.dataset.category === category && card.dataset.title === title) {
+                        card.classList.remove('card-used');
+                    }
+                });
+
+                return; // Don't copy to clipboard
+            }
+
+            const question = iconWrapper.dataset.question;
+            const answer = iconWrapper.dataset.answer;
+            const note = iconWrapper.dataset.note;
+            const reward = iconWrapper.dataset.reward;
+
+            // Build WhatsApp-formatted message with full question
+            let message = `*${category}: ${title}*\n`;
+            message += `${question}\n`;
+            message += `Answer: ${answer}\n`;
+            if (note) {
+                message += `_${note}_\n`;
+            }
+            message += `Reward: ${reward}`;
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(message).then(() => {
+                // Mark as used
+                iconWrapper.classList.add('overview-icon-used');
+
+                // Save to localStorage
+                if (!usedQuestions.includes(key)) {
+                    usedQuestions.push(key);
+                    localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
+                }
+
+                // Add to history
+                questionHistory.push({
+                    category,
+                    title,
+                    question,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('questionHistory', JSON.stringify(questionHistory));
+                renderHistory();
+
+                // Also update the normal view
+                document.querySelectorAll('.question-card, .thermometer-card').forEach(card => {
+                    if (card.dataset.category === category && card.dataset.title === title) {
+                        card.classList.add('card-used');
+                    }
+                });
+
+                // Show toast
+                showToast();
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
         }
     </script>
 </body>

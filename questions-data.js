@@ -20,33 +20,72 @@ const questionsData = {
                     },
                     {
                         title: "Station name length",
-                        question: "Is the length of your station's name the same as the length of my station's name?",
+                        question: "Is the length of your station's name the same as mine?",
                         note: "Count all characters including hyphens/spaces/'station'",
                         icon: 'text_fields'
                     },
                     {
+                        title: 'Bus stop',
+                        question: 'Is your nearest bus stop the same as mine?',
+                        icon: 'directions_bus'
+                    },
+                    {
+                        title: 'Cycle docking station',
+                        question: 'Is your nearest Santander Cycles docking station the same as mine?',
+                        icon: 'pedal_bike'
+                    },
+                    {
+                        title: 'River bus pier',
+                        question: 'Is your nearest river bus pier the same as mine?',
+                        icon: 'directions_boat'
+                    },
+                    {
                         title: 'Commercial airport',
-                        question: 'Is your nearest commercial airport the same as my commercial airport?',
+                        question: 'Is your nearest commercial airport the same as mine?',
                         note: 'Verify via Google Flights',
                         icon: 'flight'
                     }
                 ]
             },
             {
-                subcategory: 'London-Specific',
+                subcategory: 'Administrative',
                 items: [
                     {
                         title: 'London borough',
-                        question: 'Is your London Borough the same as my London Borough?',
+                        question: 'Is your London Borough the same as mine?',
                         note: '',
                         icon: 'globe_uk'
                     },
                     {
+                        title: 'Postcode area',
+                        question: 'Is your postcode area the same as mine?',
+                        note: 'e.g. [WC]2N 5DS',
+                        icon: 'local_post_office'
+                    },
+                    {
+                        title: 'Postcode district',
+                        question: 'Is your postcode district the same as mine?',
+                        note: 'e.g. [WC2]N 5DS',
+                        icon: 'local_post_office'
+                    },
+                    {
+                        title: 'Postcode subdistrict',
+                        question: 'Is your postcode subdistrict the same as mine?',
+                        note: 'e.g. [WC2N] 5DS',
+                        icon: 'local_post_office'
+                    },
+                    {
+                        title: 'Postcode sector',
+                        question: 'Is your postcode sector the same as mine?',
+                        note: 'e.g. [WC2N 5]DS',
+                        icon: 'local_post_office'
+                    },
+                    {
                         title: 'TfL fare zone',
-                        question: "Is your station's fare zone the same as my nearest station's fare zone?",
+                        question: "Is your station's fare zone the same as mine?",
                         note: 'YES if stations share any zones',
                         icon: 'transit_ticket'
-                    }
+                    },
                 ]
             },
             {
@@ -54,13 +93,13 @@ const questionsData = {
                 items: [
                     {
                         title: 'Landmass',
-                        question: 'Is your landmass the same as my landmass?',
-                        note: "Consult 'London waterways' map; e.g. opposite banks of Thames are separate landmasses",
+                        question: 'Is your landmass the same as mine?',
+                        note: 'Consult <a href="https://canoelondon.com/wordpress/wp-content/uploads/2012/02/London_waterways.pdf" target="_blank" style="color: inherit; text-decoration: underline;">London waterways</a> map; e.g. opposite banks of Thames are separate landmasses',
                         icon: 'terrain'
                     },
                     {
                         title: 'Park',
-                        question: 'Is your nearest park the same as my park?',
+                        question: 'Is your nearest park the same as mine?',
                         note: 'Measure to map icon (not to boundary)',
                         icon: 'forest'
                     }
@@ -71,7 +110,7 @@ const questionsData = {
                 items: [
                     {
                         title: 'Street or path',
-                        question: 'Is your nearest street or path the same as my street or path?',
+                        question: 'Is your nearest street or path the same as mineh?',
                         note: 'Ends when name changes, including East/West',
                         icon: 'follow_the_signs'
                     }
@@ -82,37 +121,37 @@ const questionsData = {
                 items: [
                     {
                         title: 'Museum',
-                        question: 'Is your nearest museum the same as my nearest museum?',
+                        question: 'Is your nearest museum the same as mine?',
                         note: 'Measure to map icon',
                         icon: 'museum'
                     },
                     {
                         title: 'Cinema',
-                        question: 'Is your nearest cinema the same as my nearest cinema?',
+                        question: 'Is your nearest cinema the same as mine?',
                         note: 'Measure to map icon',
                         icon: 'movie'
                     },
                     {
                         title: 'Amusement park',
-                        question: 'Is your nearest amusement park the same as my nearest amusement park?',
+                        question: 'Is your nearest amusement park the same as mine?',
                         note: 'Measure to map icon',
                         icon: 'attractions'
                     },
                     {
                         title: 'Zoo',
-                        question: 'Is your nearest zoo the same as my nearest zoo?',
+                        question: 'Is your nearest zoo the same as mine?',
                         note: 'Measure to map icon',
                         icon: 'pets'
                     },
                     {
                         title: 'Aquarium',
-                        question: 'Is your nearest aquarium the same as my nearest aquarium?',
+                        question: 'Is your nearest aquarium the same as mine?',
                         note: 'Measure to map icon',
                         icon: 'water'
                     },
                     {
                         title: 'Golf course',
-                        question: 'Is your nearest golf course the same as my nearest golf course?',
+                        question: 'Is your nearest golf course the same as mine?',
                         note: 'Outdoor only, no mini/driving range, measure to map icon',
                         icon: 'golf_course'
                     }
@@ -123,19 +162,19 @@ const questionsData = {
                 items: [
                     {
                         title: 'Hospital',
-                        question: 'Is your nearest hospital the same as my nearest hospital?',
+                        question: 'Is your nearest hospital the same as mine?',
                         note: 'Measure to map icon',
                         icon: 'local_hospital'
                     },
                     {
                         title: 'Library',
-                        question: 'Is your nearest library the same as my nearest library?',
+                        question: 'Is your nearest library the same as mine?',
                         note: 'Measure to map icon',
                         icon: 'local_library'
                     },
                     {
                         title: 'Foreign consulate',
-                        question: 'Is your nearest foreign consulate the same as my nearest foreign consulate?',
+                        question: 'Is your nearest foreign consulate the same as mine?',
                         note: 'Exclude honorary consulates, measure to map icon',
                         icon: 'account_balance'
                     }
@@ -161,16 +200,31 @@ const questionsData = {
                         icon: 'train'
                     },
                     {
-                        title: 'Commercial airport',
-                        question: 'Compared to me, are you closer to or further from a commercial airport?',
-                        note: 'Verify via Google Flights',
-                        icon: 'flight'
+                        title: 'Bus stop',
+                        question: 'Compared to me, are you closer to or further from a bus stop?',
+                        icon: 'directions_bus'
+                    },
+                    {
+                        title: 'Cycle docking station',
+                        question: 'Compared to me, are you closer to or further from a Santander Cycles docking station?',
+                        icon: 'pedal_bike'
+                    },
+                    {
+                        title: 'River bus pier',
+                        question: 'Compared to me, are you closer to or further from a river bus pier?',
+                        icon: 'directions_boat'
                     },
                     {
                         title: 'High-speed train line',
                         question: 'Compared to me, are you closer to or further from a high-speed train line?',
                         note: 'i.e. GWR from Paddington; HS1 from St Pancras; ECML from King\'s Cross; WCML from Euston',
                         icon: 'directions_railway'
+                    },
+                    {
+                        title: 'Commercial airport',
+                        question: 'Compared to me, are you closer to or further from a commercial airport?',
+                        note: 'Verify via Google Flights',
+                        icon: 'flight'
                     }
                 ]
             },
@@ -408,6 +462,12 @@ const questionsData = {
                         question: 'Send me a photo of the sky.',
                         note: 'Phone on ground, shoot up, default lens',
                         icon: 'cloud'
+                    },
+                    {
+                        title: 'Ground',
+                        question: 'Send me a photo of the ground.',
+                        note: 'Phone at arm level, shoot down, default lens',
+                        icon: 'grass'
                     }
                 ]
             },
