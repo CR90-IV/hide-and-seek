@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hider Cheat Sheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --grid-color: rgba(0, 0, 0, 0.03);
+            --station-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background:
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(0deg, var(--grid-color) 1px, transparent 1px),
+                #fafafa;
+            background-size: 20px 20px;
+        }
+
+        /* Metro line colors - bold and saturated */
+        .matching-header {
+            background-color: #1C3F94;
+        }
+
+        .matching-card {
+            background-color: white;
+            box-shadow: var(--station-shadow);
+        }
+
+        .matching-card:hover {
+            background-color: #f8f9ff;
+        }
+
+        .matching-card .icon-shape {
+            background-color: #1C3F94;
+            color: white;
+        }
+
+        .measuring-header {
+            background-color: #009B3A;
+        }
+
+        .measuring-card {
+            background-color: white;
+            box-shadow: var(--station-shadow);
+        }
+
+        .measuring-card:hover {
+            background-color: #f0fdf4;
+        }
+
+        .measuring-card .icon-shape {
+            background-color: #009B3A;
+            color: white;
+        }
+
+        .radar-header {
+            background-color: #EE352E;
+        }
+
+        .radar-card {
+            background-color: white;
+            box-shadow: var(--station-shadow);
+        }
+
+        .radar-card:hover {
+            background-color: #fef2f2;
+        }
+
+        .radar-card .icon-shape {
+            background-color: #EE352E;
+            color: white;
+        }
+
+        .thermometer-header {
+            background-color: #FCCC0A;
+        }
+
+        .thermometer-card {
+            background-color: white;
+            box-shadow: var(--station-shadow);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .thermometer-card:hover {
+            background-color: #fffbeb;
+        }
+
+        .thermometer-card .icon-shape {
+            background-color: #FCCC0A;
+            color: #000;
+        }
+
+        .tentacle-header {
+            background-color: #6D28D9;
+        }
+
+        .tentacle-card {
+            background-color: white;
+            box-shadow: var(--station-shadow);
+        }
+
+        .tentacle-card:hover {
+            background-color: #faf5ff;
+        }
+
+        .tentacle-card .icon-shape {
+            background-color: #6D28D9;
+            color: white;
+        }
+
+        .photo-header {
+            background-color: #00A9E0;
+        }
+
+        .photo-card {
+            background-color: white;
+            box-shadow: var(--station-shadow);
+        }
+
+        .photo-card:hover {
+            background-color: #f0f9ff;
+        }
+
+        .photo-card .icon-shape {
+            background-color: #00A9E0;
+            color: white;
+        }
+
+        .question-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 8px;
+        }
+
+        .icon-shape {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .card-used {
+            opacity: 0.4;
+            background-color: #f5f5f5 !important;
+        }
+
+        .card-used * {
+            color: #9ca3af !important;
+        }
+
+        .card-used .icon-shape {
+            background-color: #d1d5db !important;
+        }
+
+        section {
+            animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+        }
+
+        section:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        section:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        section:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        section:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        section:nth-child(5) {
+            animation-delay: 0.25s;
+        }
+
+        section:nth-child(6) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast {
+            animation: trainArrive 2s ease-in-out;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes trainArrive {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, 20px) scale(0.95);
+            }
+
+            15% {
+                opacity: 1;
+                transform: translate(-50%, 0) scale(1);
+            }
+
+            85% {
+                opacity: 1;
+                transform: translate(-50%, 0) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -10px) scale(0.98);
+            }
+        }
+
+        header {
+            background: white;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        header h1 {
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        /* Adjust button hover states */
+        button {
+            font-family: 'Outfit', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen pb-24">
+    <!-- Header -->
+    <header class="bg-white border-b-4 border-gray-900 p-4 shadow-sm">
+        <h1 class="text-2xl font-bold text-center text-gray-900 tracking-tight">HIDER CHEAT SHEET</h1>
+        <p class="text-center text-gray-600 text-base mt-2 font-medium">Select your question → Copy to clipboard</p>
+    </header>
+
+    <!-- Toast notification -->
+    <div id="toast"
+        class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 shadow-2xl z-50 hidden text-base border-l-4 border-green-400"
+        style="border-radius: 4px;">
+        <span class="material-symbols-outlined text-lg align-middle mr-2">check_circle</span>
+        COPIED TO CLIPBOARD
+    </div>
+
+    <!-- Reset button -->
+    <div class="fixed bottom-4 right-4 z-30">
+        <button onclick="resetAll()"
+            class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2.5 shadow-lg text-base font-semibold tracking-wide transition-all"
+            style="border-radius: 4px;">
+            <span class="material-symbols-outlined text-lg align-middle mr-1">refresh</span>
+            RESET ALL
+        </button>
+    </div>
+
+    <main id="questions-container" class="max-w-lg mx-auto p-4 space-y-6">
+        <!-- Questions will be dynamically rendered here -->
+    </main>
+
+    <script src="questions-data.js"></script>
+    <script>
+        // Load used questions from localStorage
+        const usedQuestions = JSON.parse(localStorage.getItem('usedQuestions') || '[]');
+
+        // Render all questions on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAllQuestions();
+        });
+
+        function renderAllQuestions() {
+            const container = document.getElementById('questions-container');
+
+            // Render each category
+            for (const [categoryKey, categoryData] of Object.entries(questionsData)) {
+                const section = renderCategory(categoryKey, categoryData);
+                container.appendChild(section);
+            }
+
+            // Add general rules section
+            const rulesSection = createRulesSection();
+            container.appendChild(rulesSection);
+
+            // Attach event listeners to all question cards
+            // Note: Thermometer cards don't have .question-card class and use buttons instead
+            document.querySelectorAll('.question-card').forEach(card => {
+                const key = card.dataset.category + ':' + card.dataset.title;
+                if (usedQuestions.includes(key)) {
+                    card.classList.add('card-used');
+                }
+                card.addEventListener('click', () => copyQuestion(card));
+            });
+        }
+
+        function renderCategory(categoryKey, categoryData) {
+            const section = document.createElement('section');
+
+            // Create header
+            const header = document.createElement('div');
+            header.className = `${categoryKey}-header text-white p-3`;
+            header.style.borderRadius = '4px 4px 0 0';
+            header.innerHTML = `
+                <h2 class="text-xl font-bold tracking-wide uppercase">${categoryData.title}</h2>
+                <p class="text-base ${getCategoryTextColor(categoryKey)} mt-2 font-medium">${categoryData.description}</p>
+                <div class="flex flex-wrap gap-2 mt-3 text-sm font-semibold">
+                    ${categoryData.badges.map(badge => `<span class="bg-white/30 backdrop-blur-sm px-2.5 py-1" style="border-radius: 2px;">${badge}</span>`).join('')}
+                </div>
+            `;
+            section.appendChild(header);
+
+            // Create content container
+            const content = document.createElement('div');
+            content.className = 'bg-white border-2 border-t-0 border-gray-200 p-3 space-y-2';
+            content.style.borderRadius = '0 0 4px 4px';
+
+            // Render question groups
+            categoryData.questions.forEach(group => {
+                if (group.subcategory) {
+                    const subcatLabel = document.createElement('p');
+                    subcatLabel.className = 'text-gray-700 text-sm font-bold uppercase tracking-wider pt-3 first:pt-1 flex items-center';
+                    subcatLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-current mr-2"></span>${group.subcategory}`;
+                    content.appendChild(subcatLabel);
+                }
+
+                // Create grid or regular layout
+                const itemsContainer = document.createElement('div');
+                if (categoryData.gridCols) {
+                    itemsContainer.className = `grid grid-cols-${categoryData.gridCols} gap-2`;
+                } else {
+                    itemsContainer.className = 'space-y-2';
+                }
+
+                group.items.forEach(item => {
+                    const card = createQuestionCard(categoryKey, categoryData, item);
+                    itemsContainer.appendChild(card);
+                });
+
+                content.appendChild(itemsContainer);
+            });
+
+            // Add note if exists
+            if (categoryData.note) {
+                const noteBox = document.createElement('div');
+                noteBox.className = 'bg-yellow-50 border-l-4 border-yellow-400 p-2.5 mt-3';
+                noteBox.style.borderRadius = '2px';
+                noteBox.innerHTML = `<p class="text-gray-800 text-sm font-medium"><span class="material-symbols-outlined text-base align-middle mr-1">info</span>${categoryData.note}</p>`;
+                content.appendChild(noteBox);
+            }
+
+            section.appendChild(content);
+            return section;
+        }
+
+        function createQuestionCard(categoryKey, categoryData, item) {
+            const card = document.createElement('div');
+
+            // Special handling for thermometer cards
+            if (categoryKey === 'thermometer') {
+                card.className = `${categoryKey}-card border-2 p-3 bg-white`;
+                card.style.borderRadius = '6px';
+                card.style.boxShadow = 'var(--station-shadow)';
+
+                const cardHTML = `
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center justify-center gap-2">
+                            <div class="icon-shape">
+                                <span class="material-symbols-outlined text-2xl">${item.icon}</span>
+                            </div>
+                            <p class="text-gray-900 font-semibold text-base">${item.title}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button class="thermometer-btn start-btn bg-gray-800 hover:bg-gray-700 text-white py-2 px-3 text-sm font-semibold transition-all"
+                                    style="border-radius: 4px;"
+                                    data-distance="${item.title}"
+                                    onclick="copyThermometerStart(this)">
+                                START
+                            </button>
+                            <button class="thermometer-btn end-btn bg-gray-800 hover:bg-gray-700 text-white py-2 px-3 text-sm font-semibold transition-all"
+                                    style="border-radius: 4px;"
+                                    data-category="${categoryData.title}"
+                                    data-title="${item.title}"
+                                    data-question="${item.question}"
+                                    data-answer="${item.answer || categoryData.answer}"
+                                    data-note="${item.note || ''}"
+                                    data-reward="${categoryData.reward}"
+                                    onclick="copyThermometerEnd(this)">
+                                END
+                            </button>
+                        </div>
+                    </div>
+                `;
+                card.innerHTML = cardHTML;
+                return card;
+            }
+
+            // Regular cards for other categories
+            card.className = `question-card ${categoryKey}-card border-2 p-3 cursor-pointer transition-all`;
+            card.style.borderRadius = '6px';
+
+            // Set data attributes
+            card.dataset.category = categoryData.title;
+            card.dataset.title = item.title;
+            card.dataset.question = item.question;
+            card.dataset.answer = item.answer || categoryData.answer;
+            card.dataset.note = item.note || '';
+            card.dataset.reward = categoryData.reward;
+
+            // Create content with text on left, icon shape on right
+            const isGrid = categoryData.gridCols;
+
+            if (isGrid) {
+                // Grid layout - centered with icon and text
+                let cardHTML = `
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="icon-shape">
+                            <span class="material-symbols-outlined text-2xl">${item.icon}</span>
+                        </div>
+                        <p class="text-gray-900 font-semibold text-base text-center">${item.subtitle ? 'Choose' : item.title}</p>
+                `;
+                if (item.subtitle) {
+                    cardHTML += `<p class="text-gray-600 text-sm text-center font-medium">${item.subtitle}</p>`;
+                }
+                cardHTML += `</div>`;
+                card.innerHTML = cardHTML;
+            } else {
+                // Regular layout - icon on left, text on right
+                let cardHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="icon-shape">
+                            <span class="material-symbols-outlined text-2xl">${item.icon}</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-gray-900 font-semibold text-base">${item.title}</p>
+                `;
+                if (item.note) {
+                    cardHTML += `<p class="text-gray-600 text-sm mt-1 leading-relaxed">${item.note}</p>`;
+                }
+                cardHTML += `
+                        </div>
+                    </div>
+                `;
+                card.innerHTML = cardHTML;
+            }
+
+            return card;
+        }
+
+        function createRulesSection() {
+            const section = document.createElement('section');
+            section.innerHTML = `
+                <div class="bg-white border-2 border-gray-300 p-4 shadow-sm" style="border-radius: 4px;">
+                    <h2 class="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide flex items-center">
+                        <span class="material-symbols-outlined mr-2 text-xl">rule</span>
+                        General Rules
+                    </h2>
+                    <ul class="space-y-2.5 text-base text-gray-700">
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-lg text-gray-400">radio_button_unchecked</span>
+                            <span class="leading-relaxed">Locations outside map boundaries = don't exist (null answers count, you still draw)</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-lg text-gray-400">radio_button_unchecked</span>
+                            <span class="leading-relaxed">Cannot ask multiple questions simultaneously</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-lg text-gray-400">radio_button_unchecked</span>
+                            <span class="leading-relaxed">Must answer before next question asked</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-lg text-gray-400">radio_button_unchecked</span>
+                            <span class="leading-relaxed">All answers must be truthful</span>
+                        </li>
+                    </ul>
+                </div>
+            `;
+            return section;
+        }
+
+        function getCategoryTextColor(categoryKey) {
+            const colorMap = {
+                'matching': 'text-gray-200',
+                'measuring': 'text-green-100',
+                'radar': 'text-orange-100',
+                'thermometer': 'text-yellow-100',
+                'photo': 'text-blue-100',
+                'tentacle': 'text-purple-100'
+            };
+            return colorMap[categoryKey] || 'text-gray-100';
+        }
+
+        function copyQuestion(card) {
+            const category = card.dataset.category;
+            const title = card.dataset.title;
+            const question = card.dataset.question;
+            const answer = card.dataset.answer;
+            const note = card.dataset.note;
+            const reward = card.dataset.reward;
+
+            // Build WhatsApp-formatted message with full question
+            let message = `*${category}: ${title}*\n`;
+            message += `${question}\n`;
+            message += `Answer: ${answer}\n`;
+            if (note) {
+                message += `_${note}_\n`;
+            }
+            message += `Reward: ${reward}`;
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(message).then(() => {
+                // Mark as used
+                card.classList.add('card-used');
+
+                // Save to localStorage
+                const key = category + ':' + title;
+                if (!usedQuestions.includes(key)) {
+                    usedQuestions.push(key);
+                    localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
+                }
+
+                // Show toast
+                showToast();
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        function copyThermometerStart(button) {
+            const distance = button.dataset.distance;
+            const message = `Starting a ${distance} thermometer`;
+
+            navigator.clipboard.writeText(message).then(() => {
+                showToast();
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        function copyThermometerEnd(button) {
+            const category = button.dataset.category;
+            const title = button.dataset.title;
+            const question = button.dataset.question;
+            const answer = button.dataset.answer;
+            const note = button.dataset.note;
+            const reward = button.dataset.reward;
+
+            // Build WhatsApp-formatted message with full question
+            let message = `*${category}: ${title}*\n`;
+            message += `${question}\n`;
+            message += `Answer: ${answer}\n`;
+            if (note) {
+                message += `_${note}_\n`;
+            }
+            message += `Reward: ${reward}`;
+
+            navigator.clipboard.writeText(message).then(() => {
+                showToast();
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+            toast.classList.add('toast');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('toast');
+            }, 2000);
+        }
+
+        function resetAll() {
+            if (confirm('Reset all questions to unused?')) {
+                localStorage.removeItem('usedQuestions');
+                usedQuestions.length = 0;
+                document.querySelectorAll('.question-card').forEach(card => {
+                    card.classList.remove('card-used');
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>
