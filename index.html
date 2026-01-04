@@ -25,6 +25,10 @@
             background-size: 20px 20px;
         }
 
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
         /* Metro line colors - bold and saturated */
         .matching-header {
             background-color: #1C3F94;
@@ -163,6 +167,15 @@
             background-color: #d1d5db !important;
         }
 
+        .card-used .thermometer-btn {
+            border-color: #d1d5db !important;
+            cursor: not-allowed;
+        }
+
+        .card-used .thermometer-btn:hover {
+            background-color: white !important;
+        }
+
         section {
             animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards;
         }
@@ -252,26 +265,26 @@
 <body class="bg-gray-50 min-h-screen pb-24">
     <!-- Header -->
     <header class="bg-white border-b-4 border-gray-900 p-4 shadow-sm">
-        <h1 class="text-2xl font-bold text-center text-gray-900 tracking-tight">HIDER CHEAT SHEET</h1>
-        <p class="text-center text-gray-600 text-base mt-2 font-medium">Select your question → Copy to clipboard</p>
+        <div class="max-w-lg mx-auto flex items-center justify-between gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">HIDER CHEAT SHEET</h1>
+                <p class="text-gray-600 text-base mt-1 font-medium">Select your question → Copy to clipboard</p>
+            </div>
+            <button onclick="resetAll()"
+                class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2.5 shadow-sm text-sm font-semibold tracking-wide transition-all flex-shrink-0"
+                style="border-radius: 4px;">
+                <span class="material-symbols-outlined text-lg align-middle mr-1">refresh</span>
+                RESET
+            </button>
+        </div>
     </header>
 
     <!-- Toast notification -->
     <div id="toast"
-        class="fixed bottom-20 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 shadow-2xl z-50 hidden text-base border-l-4 border-green-400"
+        class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 shadow-2xl z-50 hidden text-base border-l-4 border-green-400"
         style="border-radius: 4px;">
         <span class="material-symbols-outlined text-lg align-middle mr-2">check_circle</span>
         COPIED TO CLIPBOARD
-    </div>
-
-    <!-- Reset button -->
-    <div class="fixed bottom-4 right-4 z-30">
-        <button onclick="resetAll()"
-            class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2.5 shadow-lg text-base font-semibold tracking-wide transition-all"
-            style="border-radius: 4px;">
-            <span class="material-symbols-outlined text-lg align-middle mr-1">refresh</span>
-            RESET ALL
-        </button>
     </div>
 
     <main id="questions-container" class="max-w-lg mx-auto p-4 space-y-6">
@@ -302,13 +315,20 @@
             container.appendChild(rulesSection);
 
             // Attach event listeners to all question cards
-            // Note: Thermometer cards don't have .question-card class and use buttons instead
             document.querySelectorAll('.question-card').forEach(card => {
                 const key = card.dataset.category + ':' + card.dataset.title;
                 if (usedQuestions.includes(key)) {
                     card.classList.add('card-used');
                 }
                 card.addEventListener('click', () => copyQuestion(card));
+            });
+
+            // Mark thermometer cards as used if they're in localStorage
+            document.querySelectorAll('.thermometer-card').forEach(card => {
+                const key = card.dataset.category + ':' + card.dataset.title;
+                if (usedQuestions.includes(key)) {
+                    card.classList.add('card-used');
+                }
             });
         }
 
@@ -376,36 +396,40 @@
 
             // Special handling for thermometer cards
             if (categoryKey === 'thermometer') {
-                card.className = `${categoryKey}-card border-2 p-3 bg-white`;
+                card.className = `thermometer-card border-2 p-3 bg-white`;
                 card.style.borderRadius = '6px';
                 card.style.boxShadow = 'var(--station-shadow)';
 
+                // Set data attributes for tracking
+                card.dataset.category = categoryData.title;
+                card.dataset.title = item.title;
+
                 const cardHTML = `
-                    <div class="flex flex-col gap-2">
-                        <div class="flex items-center justify-center gap-2">
-                            <div class="icon-shape">
-                                <span class="material-symbols-outlined text-2xl">${item.icon}</span>
-                            </div>
-                            <p class="text-gray-900 font-semibold text-base">${item.title}</p>
+                    <div class="flex items-center gap-3">
+                        <div class="icon-shape">
+                            <span class="material-symbols-outlined text-2xl">${item.icon}</span>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button class="thermometer-btn start-btn bg-gray-800 hover:bg-gray-700 text-white py-2 px-3 text-sm font-semibold transition-all"
-                                    style="border-radius: 4px;"
-                                    data-distance="${item.title}"
-                                    onclick="copyThermometerStart(this)">
-                                START
-                            </button>
-                            <button class="thermometer-btn end-btn bg-gray-800 hover:bg-gray-700 text-white py-2 px-3 text-sm font-semibold transition-all"
-                                    style="border-radius: 4px;"
-                                    data-category="${categoryData.title}"
-                                    data-title="${item.title}"
-                                    data-question="${item.question}"
-                                    data-answer="${item.answer || categoryData.answer}"
-                                    data-note="${item.note || ''}"
-                                    data-reward="${categoryData.reward}"
-                                    onclick="copyThermometerEnd(this)">
-                                END
-                            </button>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-gray-900 font-semibold text-base mb-2">${item.title}</p>
+                            <div class="flex gap-2">
+                                <button class="thermometer-btn start-btn flex-1 bg-white hover:bg-gray-50 border-2 border-gray-300 text-gray-700 py-1.5 px-2 text-xs font-semibold transition-all"
+                                        style="border-radius: 4px;"
+                                        data-distance="${item.title}"
+                                        onclick="copyThermometerStart(this, event)">
+                                    Start
+                                </button>
+                                <button class="thermometer-btn end-btn flex-1 bg-white hover:bg-gray-50 border-2 border-gray-300 text-gray-700 py-1.5 px-2 text-xs font-semibold transition-all"
+                                        style="border-radius: 4px;"
+                                        data-category="${categoryData.title}"
+                                        data-title="${item.title}"
+                                        data-question="${item.question}"
+                                        data-answer="${item.answer || categoryData.answer}"
+                                        data-note="${item.note || ''}"
+                                        data-reward="${categoryData.reward}"
+                                        onclick="copyThermometerEnd(this, event)">
+                                    End
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -545,7 +569,15 @@
             });
         }
 
-        function copyThermometerStart(button) {
+        function copyThermometerStart(button, event) {
+            event.stopPropagation();
+
+            // Check if card is already used
+            const card = button.closest('.thermometer-card');
+            if (card && card.classList.contains('card-used')) {
+                return;
+            }
+
             const distance = button.dataset.distance;
             const message = `Starting a ${distance} thermometer`;
 
@@ -557,7 +589,15 @@
             });
         }
 
-        function copyThermometerEnd(button) {
+        function copyThermometerEnd(button, event) {
+            event.stopPropagation();
+
+            // Check if card is already used
+            const card = button.closest('.thermometer-card');
+            if (card && card.classList.contains('card-used')) {
+                return;
+            }
+
             const category = button.dataset.category;
             const title = button.dataset.title;
             const question = button.dataset.question;
@@ -575,6 +615,18 @@
             message += `Reward: ${reward}`;
 
             navigator.clipboard.writeText(message).then(() => {
+                // Mark card as used
+                if (card) {
+                    card.classList.add('card-used');
+
+                    // Save to localStorage
+                    const key = category + ':' + title;
+                    if (!usedQuestions.includes(key)) {
+                        usedQuestions.push(key);
+                        localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
+                    }
+                }
+
                 showToast();
             }).catch(err => {
                 console.error('Failed to copy:', err);
@@ -598,6 +650,9 @@
                 localStorage.removeItem('usedQuestions');
                 usedQuestions.length = 0;
                 document.querySelectorAll('.question-card').forEach(card => {
+                    card.classList.remove('card-used');
+                });
+                document.querySelectorAll('.thermometer-card').forEach(card => {
                     card.classList.remove('card-used');
                 });
             }

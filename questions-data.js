@@ -360,7 +360,6 @@ const questionsData = {
         answer: 'HOTTER (closer) or COLDER (farther)',
         reward: 'Draw 2, keep 1',
         note: 'Measured as the crow flies. HOTTER = closer, COLDER = farther',
-        gridCols: 3,
         questions: [
             {
                 items: [
