@@ -609,6 +609,26 @@
             return colorMap[categoryKey] || 'text-gray-100';
         }
 
+        // Helper function to convert HTML links to plain text with URLs
+        function convertLinksToPlainText(html) {
+            if (!html) return html;
+
+            // Create a temporary element to parse HTML
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+
+            // Find all anchor tags and replace them with "text: URL" format
+            const links = temp.querySelectorAll('a');
+            links.forEach(link => {
+                const text = link.textContent;
+                const url = link.href;
+                const replacement = document.createTextNode(`${text}: ${url}`);
+                link.parentNode.replaceChild(replacement, link);
+            });
+
+            return temp.textContent;
+        }
+
         function copyQuestion(card) {
             const category = card.dataset.category;
             const title = card.dataset.title;
@@ -645,7 +665,8 @@
             message += `${question}\n`;
             message += `Answer: ${answer}\n`;
             if (note) {
-                message += `_${note}_\n`;
+                const plainTextNote = convertLinksToPlainText(note);
+                message += `_${plainTextNote}_\n`;
             }
             message += `Reward: ${reward}`;
 
@@ -719,7 +740,8 @@
             message += `${question}\n`;
             message += `Answer: ${answer}\n`;
             if (note) {
-                message += `_${note}_\n`;
+                const plainTextNote = convertLinksToPlainText(note);
+                message += `_${plainTextNote}_\n`;
             }
             message += `Reward: ${reward}`;
 
@@ -955,7 +977,8 @@
             message += `${question}\n`;
             message += `Answer: ${answer}\n`;
             if (note) {
-                message += `_${note}_\n`;
+                const plainTextNote = convertLinksToPlainText(note);
+                message += `_${plainTextNote}_\n`;
             }
             message += `Reward: ${reward}`;
 

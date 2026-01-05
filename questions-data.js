@@ -7,7 +7,7 @@ const questionsData = {
         badges: ['YES / NO', '5 min', 'Draw 3, keep 1'],
         answer: 'YES or NO',
         reward: 'Draw 3, keep 1',
-        note: "Locations outside map boundaries don't exist = null answer (still counts, you still draw)",
+        note: "Seekers should say which item is their nearest. Treat locations outside map boundaries as if they don't exist. A null answer still counts and the hider still draws.",
         questions: [
             {
                 subcategory: 'Transport',
@@ -37,6 +37,7 @@ const questionsData = {
                     {
                         title: 'River bus pier',
                         question: 'Is your nearest river bus pier the same as mine?',
+                        note: 'See <a href="https://content.tfl.gov.uk/riverservices-map.pdf" target="_blank" style="color: inherit; text-decoration: underline;">map of London river services</a>.',
                         icon: 'directions_boat'
                     },
                     {
@@ -94,7 +95,7 @@ const questionsData = {
                     {
                         title: 'Landmass',
                         question: 'Is your landmass the same as mine?',
-                        note: 'Consult <a href="https://canoelondon.com/wordpress/wp-content/uploads/2012/02/London_waterways.pdf" target="_blank" style="color: inherit; text-decoration: underline;">London waterways</a> map; e.g. opposite banks of Thames are separate landmasses',
+                        note: 'See <a href="https://canoelondon.com/wordpress/wp-content/uploads/2012/02/London_waterways.pdf" target="_blank" style="color: inherit; text-decoration: underline;">map of London waterways</a>; e.g. opposite banks of Thames are separate landmasses',
                         icon: 'terrain'
                     },
                     {
@@ -176,7 +177,7 @@ const questionsData = {
                         title: 'Foreign consulate',
                         question: 'Is your nearest foreign consulate the same as mine?',
                         note: 'Exclude honorary consulates, measure to map icon',
-                        icon: 'account_balance'
+                        icon: 'passport'
                     }
                 ]
             }
@@ -189,6 +190,7 @@ const questionsData = {
         badges: ['CLOSER / FURTHER', '5 min', 'Draw 3, keep 1'],
         answer: 'CLOSER or FURTHER',
         reward: 'Draw 3, keep 1',
+        note: "Seekers should say how far they are from the relevant item.",
         questions: [
             {
                 subcategory: 'Transit-Related',
@@ -252,20 +254,14 @@ const questionsData = {
                         title: 'Sea level',
                         question: 'Compared to me, are you closer to or further from sea level?',
                         answer: 'CLOSER, FURTHER, or AMBIGUOUS',
-                        note: 'Your altitude; answer AMBIGUOUS if unclear/too similar (still counts)',
+                        note: 'i.e. your altitude; answer AMBIGUOUS if unclear/too similar (still counts)',
                         icon: 'altitude'
                     },
                     {
                         title: 'Body of water',
                         question: 'Compared to me, are you closer to or further from a body of water?',
-                        note: 'Any named body, not pools',
+                        note: 'Any named body on Google Maps, not pools',
                         icon: 'water'
-                    },
-                    {
-                        title: 'Mountain',
-                        question: 'Compared to me, are you closer to or further from a mountain?',
-                        note: 'Measure to map icon',
-                        icon: 'landscape'
                     },
                     {
                         title: 'Park',
@@ -335,7 +331,7 @@ const questionsData = {
                         title: 'Foreign consulate',
                         question: 'Compared to me, are you closer to or further from a foreign consulate?',
                         note: 'Measure to map icon',
-                        icon: 'account_balance'
+                        icon: 'passport'
                     }
                 ]
             }
@@ -348,7 +344,7 @@ const questionsData = {
         badges: ['YES / NO', '5 min', 'Draw 2, keep 1'],
         answer: 'YES or NO',
         reward: 'Draw 2, keep 1',
-        note: 'Answer based on YOUR LOCATION, not your hiding zone',
+        note: 'Hiders answer based on their location, not your hiding zone',
         gridCols: 2,
         questions: [
             {
@@ -356,51 +352,50 @@ const questionsData = {
                     {
                         title: '500m',
                         question: 'Are you within 500m of me?',
-                        note: 'Answer based on YOUR location, not your hiding zone',
+                        note: 'Answer based on your location, not your hiding zone',
                         icon: 'my_location'
                     },
                     {
                         title: '1km',
                         question: 'Are you within 1km of me?',
-                        note: 'Answer based on YOUR location, not your hiding zone',
+                        note: 'Answer based on your location, not your hiding zone',
                         icon: 'my_location'
                     },
                     {
                         title: '2km',
                         question: 'Are you within 2km of me?',
-                        note: 'Answer based on YOUR location, not your hiding zone',
+                        note: 'Answer based on your location, not your hiding zone',
                         icon: 'my_location'
                     },
                     {
                         title: '5km',
                         question: 'Are you within 5km of me?',
-                        note: 'Answer based on YOUR location, not your hiding zone',
+                        note: 'Answer based on your location, not your hiding zone',
                         icon: 'my_location'
                     },
                     {
                         title: '10km',
                         question: 'Are you within 10km of me?',
-                        note: 'Answer based on YOUR location, not your hiding zone',
+                        note: 'Answer based on your location, not your hiding zone',
                         icon: 'my_location'
                     },
                     {
                         title: '15km',
                         question: 'Are you within 15km of me?',
-                        note: 'Answer based on YOUR location, not your hiding zone',
+                        note: 'Answer based on your location, not your hiding zone',
                         icon: 'my_location'
                     },
                     {
                         title: '40km',
                         question: 'Are you within 40km of me?',
-                        note: 'Answer based on YOUR location, not your hiding zone',
+                        note: 'Answer based on your location, not your hiding zone',
                         icon: 'my_location'
                     },
                     {
-                        title: '[DISTANCE]',
+                        title: 'Custom',
                         question: 'Are you within [DISTANCE] of me?',
-                        note: 'Choose any distance. Answer based on YOUR location, not your hiding zone',
+                        note: 'Answer based on your location, not your hiding zone',
                         icon: 'my_location',
-                        subtitle: 'any distance'
                     }
                 ]
             }
@@ -413,7 +408,7 @@ const questionsData = {
         badges: ['HOTTER / COLDER', '5 min', 'Draw 2, keep 1'],
         answer: 'HOTTER (closer) or COLDER (farther)',
         reward: 'Draw 2, keep 1',
-        note: 'Measured as the crow flies. HOTTER = closer, COLDER = farther',
+        note: 'Seekers say when they are starting a thermometer. When ending a thermometer, seekers provide their start and end locations. Distance measured as the crow flies.',
         questions: [
             {
                 items: [
@@ -442,7 +437,7 @@ const questionsData = {
     photo: {
         color: '#81B5CD',
         title: 'PHOTO',
-        description: '"Send me a photo of ___"',
+        description: '"Send a photo of ___"',
         badges: ['Photo / Cannot answer', '10 min', 'Draw 1, keep 1'],
         answer: "Photo or 'I cannot answer the question'",
         reward: 'Draw 1, keep 1',
@@ -453,20 +448,20 @@ const questionsData = {
                 items: [
                     {
                         title: 'You (selfie)',
-                        question: 'Send me a photo of you (selfie).',
+                        question: 'Send a photo of you (selfie).',
                         note: 'Arm extended, phone perpendicular to ground, default lens',
                         icon: 'face'
                     },
                     {
                         title: 'Sky',
-                        question: 'Send me a photo of the sky.',
-                        note: 'Phone on ground, shoot up, default lens',
+                        question: 'Send a photo of the sky.',
+                        note: 'Phone on ground, facing directly up, default lens',
                         icon: 'cloud'
                     },
                     {
                         title: 'Ground',
-                        question: 'Send me a photo of the ground.',
-                        note: 'Phone at arm level, shoot down, default lens',
+                        question: 'Send a photo of the ground.',
+                        note: 'Phone at arm level, facing directly down, default lens',
                         icon: 'grass'
                     }
                 ]
@@ -475,27 +470,27 @@ const questionsData = {
                 subcategory: 'Structures & Buildings',
                 items: [
                     {
-                        title: 'Structure with highest elevation',
-                        question: 'Send me a photo of the structure with highest elevation from your sightline.',
+                        title: 'Structure with highest elevation in your sightline',
+                        question: 'Send a photo of the structure with highest angle of elevation from your sightline.',
                         note: 'Include top + both sides, top in top 1/3 of frame',
                         icon: 'apartment'
                     },
                     {
                         title: 'Structure with highest elevation from station',
-                        question: 'Send me a photo of the structure with highest elevation from the entrance of your station.',
+                        question: 'Send a photo of the structure with highest angle of elevation from an entrance of your station.',
                         note: "Your choice of entrance; top + both sides, top in top 1/3 of frame; station building doesn't count unless building above has separate purpose",
                         icon: 'domain'
                     },
                     {
-                        title: 'Any building from station',
-                        question: 'Send me a photo of any building from the entrance of your station.',
+                        title: 'Any building visible from station',
+                        question: 'Send a photo of any building from the entrance of your station.',
                         note: 'Your choice of entrance; roof + both sides, top in top 1/3 of frame',
                         icon: 'business'
                     },
                     {
                         title: '2 buildings',
-                        question: 'Send me a photo of 2 buildings.',
-                        note: 'Bottom to 4 stories',
+                        question: 'Send a photo of 2 buildings.',
+                        note: 'Bottom and to 4 stories',
                         icon: 'location_city'
                     }
                 ]
@@ -505,14 +500,14 @@ const questionsData = {
                 items: [
                     {
                         title: 'Widest street',
-                        question: 'Send me a photo of the widest street.',
-                        note: 'Both sides visible',
+                        question: 'Send a photo of the widest street.',
+                        note: 'Both sides of the street visible. Street/path visible on Google Maps.',
                         icon: 'follow_the_signs'
                     },
                     {
                         title: 'Trace nearest street/path',
-                        question: 'Send me a photo tracing the nearest street/path.',
-                        note: 'Intersection to intersection, street/path on Google Maps',
+                        question: 'Send a sketch of the nearest street/path.',
+                        note: 'Intersection to intersection. Street/path visible on Google Maps',
                         icon: 'stylus_note'
                     }
                 ]
@@ -522,7 +517,7 @@ const questionsData = {
                 items: [
                     {
                         title: 'Train platform',
-                        question: 'Send me a photo of a train platform.',
+                        question: 'Send a photo of a train platform.',
                         note: '2m x 2m section, 3 distinct matchable elements',
                         icon: 'train'
                     }
@@ -533,20 +528,20 @@ const questionsData = {
                 items: [
                     {
                         title: 'Tree',
-                        question: 'Send me a photo of a tree.',
-                        note: 'Entire tree',
+                        question: 'Send a photo of an entire tree.',
+                        note: '',
                         icon: 'nature'
                     },
                     {
                         title: 'Park',
-                        question: 'Send me a photo of a park.',
-                        note: 'No zoom, perpendicular, 2m from obstruction',
+                        question: 'Send a photo of a park.',
+                        note: 'No zoom, perpendicular to ground, 2m from obstruction',
                         icon: 'forest'
                     },
                     {
                         title: 'Telephone box',
-                        question: 'Send me a photo of a telephone box.',
-                        note: 'Entire telephone box',
+                        question: 'Send a photo of an entire telephone box.',
+                        note: '',
                         icon: 'phone'
                     }
                 ]
@@ -556,14 +551,14 @@ const questionsData = {
                 items: [
                     {
                         title: 'Restaurant interior',
-                        question: 'Send me a photo of a restaurant interior.',
+                        question: 'Send a photo of a restaurant interior.',
                         note: 'Through window from outside, no zoom',
                         icon: 'restaurant'
                     },
                     {
                         title: 'Shop aisle',
-                        question: 'Send me a photo of an aisle in a shop.',
-                        note: 'From end, down aisle, no zoom',
+                        question: 'Send a photo of an aisle in a shop.',
+                        note: 'From end of aisle shooting down, no zoom',
                         icon: 'shopping_cart'
                     }
                 ]
@@ -578,32 +573,29 @@ const questionsData = {
         answer: "Location name or 'Not within reach'",
         reward: 'Draw 4, keep 2',
         gridCols: 2,
+        note: 'Seekers should send a list of locations for the hider to choose from.',
         questions: [
             {
                 subcategory: 'Within 2 km',
                 items: [
                     {
                         title: 'Museums (2km)',
-                        question: 'Within 2km of me, which museum are you nearest to?',
-                        note: 'Within 2km of seeker',
+                        question: 'Of all the museums within 2km of me, which are you closest to?',
                         icon: 'museum'
                     },
                     {
                         title: 'Libraries (2km)',
-                        question: 'Within 2km of me, which library are you nearest to?',
-                        note: 'Within 2km of seeker',
+                        question: 'Of all the libraries within 2km of me, which are you closest to?',
                         icon: 'local_library'
                     },
                     {
                         title: 'Cinemas (2km)',
-                        question: 'Within 2km of me, which cinema are you nearest to?',
-                        note: 'Within 2km of seeker',
+                        question: 'Of all the cinemas within 2km of me, which are you closest to?',
                         icon: 'movie'
                     },
                     {
                         title: 'Hospitals (2km)',
-                        question: 'Within 2km of me, which hospital are you nearest to?',
-                        note: 'Within 2km of seeker',
+                        question: 'Of all the hospitals within 2km of me, which are you closest to?',
                         icon: 'local_hospital'
                     }
                 ]
