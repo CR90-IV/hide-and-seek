@@ -214,6 +214,7 @@ const questionsData = {
                     {
                         title: 'River bus pier',
                         question: 'Compared to me, are you closer to or further from a river bus pier?',
+                        note: 'See <a href="https://content.tfl.gov.uk/riverservices-map.pdf" target="_blank" style="color: inherit; text-decoration: underline;">map of London river services</a>.',
                         icon: 'directions_boat'
                     },
                     {

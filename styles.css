@@ -1,0 +1,318 @@
+/* ============================================
+   CSS VARIABLES & THEME
+   ============================================ */
+:root {
+    --grid-color: rgba(0, 0, 0, 0.03);
+    --station-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================
+   GLOBAL STYLES
+   ============================================ */
+body {
+    font-family: 'Outfit', sans-serif;
+    background:
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
+        linear-gradient(0deg, var(--grid-color) 1px, transparent 1px),
+        #fafafa;
+    background-size: 20px 20px;
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes trainArrive {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 20px) scale(0.95);
+    }
+
+    15% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
+
+    85% {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -10px) scale(0.98);
+    }
+}
+
+/* ============================================
+   LAYOUT & STRUCTURE
+   ============================================ */
+header {
+    background: white;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+header h1 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+section {
+    animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+section:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+section:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+section:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+section:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+section:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+section:nth-child(6) {
+    animation-delay: 0.3s;
+}
+
+/* ============================================
+   COMPONENTS
+   ============================================ */
+button {
+    font-family: 'Outfit', sans-serif;
+}
+
+.question-card {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px;
+}
+
+.icon-shape {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.toast {
+    animation: trainArrive 2s ease-in-out;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Card "used" state styling */
+.card-used {
+    opacity: 0.4;
+    background-color: #f5f5f5 !important;
+}
+
+.card-used * {
+    color: #9ca3af !important;
+}
+
+.card-used .icon-shape {
+    background-color: #d1d5db !important;
+}
+
+.card-used .thermometer-btn {
+    border-color: #d1d5db !important;
+    cursor: not-allowed;
+}
+
+.card-used .thermometer-btn:hover {
+    background-color: white !important;
+}
+
+/* ============================================
+   CATEGORY THEMES
+   ============================================ */
+
+/* MATCHING - Deep Blue (#1C3F94) */
+.matching-header {
+    background-color: #1C3F94;
+}
+
+.matching-card {
+    background-color: white;
+    box-shadow: var(--station-shadow);
+}
+
+.matching-card:hover {
+    background-color: #f8f9ff;
+}
+
+.matching-card .icon-shape {
+    background-color: #1C3F94;
+    color: white;
+}
+
+.icon-shape.matching-card,
+.matching-card .icon-shape {
+    background-color: #1C3F94;
+    color: white;
+}
+
+/* MEASURING - Kelly Green (#009B3A) */
+.measuring-header {
+    background-color: #009B3A;
+}
+
+.measuring-card {
+    background-color: white;
+    box-shadow: var(--station-shadow);
+}
+
+.measuring-card:hover {
+    background-color: #f0fdf4;
+}
+
+.measuring-card .icon-shape {
+    background-color: #009B3A;
+    color: white;
+}
+
+.icon-shape.measuring-card,
+.measuring-card .icon-shape {
+    background-color: #009B3A;
+    color: white;
+}
+
+/* RADAR - Signal Red (#EE352E) */
+.radar-header {
+    background-color: #EE352E;
+}
+
+.radar-card {
+    background-color: white;
+    box-shadow: var(--station-shadow);
+}
+
+.radar-card:hover {
+    background-color: #fef2f2;
+}
+
+.radar-card .icon-shape {
+    background-color: #EE352E;
+    color: white;
+}
+
+.icon-shape.radar-card,
+.radar-card .icon-shape {
+    background-color: #EE352E;
+    color: white;
+}
+
+/* THERMOMETER - Yellow (#FCCC0A) */
+.thermometer-header {
+    background-color: #FCCC0A;
+}
+
+.thermometer-card {
+    background-color: white;
+    box-shadow: var(--station-shadow);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.thermometer-card:hover {
+    background-color: #fffbeb;
+}
+
+.thermometer-card .icon-shape {
+    background-color: #FCCC0A;
+    color: #000;
+}
+
+.icon-shape.thermometer-card,
+.thermometer-card .icon-shape {
+    background-color: #FCCC0A;
+    color: #000;
+}
+
+/* TENTACLE - Purple (#6D28D9) */
+.tentacle-header {
+    background-color: #6D28D9;
+}
+
+.tentacle-card {
+    background-color: white;
+    box-shadow: var(--station-shadow);
+}
+
+.tentacle-card:hover {
+    background-color: #faf5ff;
+}
+
+.tentacle-card .icon-shape {
+    background-color: #6D28D9;
+    color: white;
+}
+
+.icon-shape.tentacle-card,
+.tentacle-card .icon-shape {
+    background-color: #6D28D9;
+    color: white;
+}
+
+/* PHOTO - Sky Blue (#00A9E0) */
+.photo-header {
+    background-color: #00A9E0;
+}
+
+.photo-card {
+    background-color: white;
+    box-shadow: var(--station-shadow);
+}
+
+.photo-card:hover {
+    background-color: #f0f9ff;
+}
+
+.photo-card .icon-shape {
+    background-color: #00A9E0;
+    color: white;
+}
+
+.icon-shape.photo-card,
+.photo-card .icon-shape {
+    background-color: #00A9E0;
+    color: white;
+}
+
+/* ============================================
+   VIEW MODES
+   ============================================ */
+
+/* Overview icon styles */
+.overview-icon-used {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
