@@ -468,7 +468,7 @@ const questionsData = {
                         title: 'Structure with highest elevation from station',
                         question: 'Send a photo of the structure with highest angle of elevation from an entrance of your station.',
                         note: "Your choice of entrance; top + both sides, top in top 1/3 of frame; station building doesn't count unless building above has separate purpose",
-                        icon: 'apartment'
+                        icon: 'domain'
                     },
                     {
                         title: 'Any building visible from station',
@@ -592,6 +592,7 @@ const questionsData = {
         ]
     }
 };
+
 
 // General rules data
 const rulesData = {
