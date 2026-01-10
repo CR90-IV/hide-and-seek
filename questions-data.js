@@ -25,6 +25,12 @@ const questionsData = {
                         icon: 'text_fields'
                     },
                     {
+                        title: "Night tube status",
+                        question: "Does your station have the same night tube service as mine?",
+                        note: 'See <a href="https://content.tfl.gov.uk/standard-night-tube-map.pdf" target="_blank" style="color: inherit; text-decoration: underline;">map of Night tube services</a>. Ignore temporary closures.',
+                        icon: 'owl'
+                    },
+                    {
                         title: 'Bus stop',
                         question: 'Is your nearest bus stop the same as mine?',
                         icon: 'directions_bus'
@@ -68,25 +74,7 @@ const questionsData = {
                         question: 'Is your postcode district the same as mine?',
                         note: 'e.g. [WC2]N 5DS',
                         icon: 'local_post_office'
-                    },
-                    {
-                        title: 'Postcode subdistrict',
-                        question: 'Is your postcode subdistrict the same as mine?',
-                        note: 'e.g. [WC2N] 5DS',
-                        icon: 'local_post_office'
-                    },
-                    {
-                        title: 'Postcode sector',
-                        question: 'Is your postcode sector the same as mine?',
-                        note: 'e.g. [WC2N 5]DS',
-                        icon: 'local_post_office'
-                    },
-                    {
-                        title: 'TfL fare zone',
-                        question: "Is your station's fare zone the same as mine?",
-                        note: 'YES if stations share any zones',
-                        icon: 'transit_ticket'
-                    },
+                    }
                 ]
             },
             {
@@ -111,7 +99,7 @@ const questionsData = {
                 items: [
                     {
                         title: 'Street or path',
-                        question: 'Is your nearest street or path the same as mineh?',
+                        question: 'Is your nearest street or path the same as mine?',
                         note: 'Ends when name changes, including East/West',
                         icon: 'follow_the_signs'
                     }
@@ -345,7 +333,7 @@ const questionsData = {
         badges: ['YES / NO', '5 min', 'Draw 2, keep 1'],
         answer: 'YES or NO',
         reward: 'Draw 2, keep 1',
-        note: 'Hiders answer based on their location, not your hiding zone',
+        note: 'Hiders answer based on their location, not their hiding zone',
         gridCols: 2,
         questions: [
             {

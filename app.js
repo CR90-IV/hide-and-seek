@@ -277,19 +277,11 @@ function createRulesSection() {
             <ul class="space-y-2.5 text-base text-gray-700">
                 <li class="flex items-start gap-3">
                     <span class="material-symbols-outlined text-lg text-gray-400">radio_button_unchecked</span>
-                    <span class="leading-relaxed">Locations outside map boundaries = don't exist (null answers count, you still draw)</span>
+                    <span class="leading-relaxed">Treat locations outside map boundaries as if they don't exist.</span>
                 </li>
                 <li class="flex items-start gap-3">
                     <span class="material-symbols-outlined text-lg text-gray-400">radio_button_unchecked</span>
-                    <span class="leading-relaxed">Cannot ask multiple questions simultaneously</span>
-                </li>
-                <li class="flex items-start gap-3">
-                    <span class="material-symbols-outlined text-lg text-gray-400">radio_button_unchecked</span>
-                    <span class="leading-relaxed">Must answer before next question asked</span>
-                </li>
-                <li class="flex items-start gap-3">
-                    <span class="material-symbols-outlined text-lg text-gray-400">radio_button_unchecked</span>
-                    <span class="leading-relaxed">All answers must be truthful</span>
+                    <span class="leading-relaxed">Seekers can only ask one question at a time, and must wait for an answer before asking the next question.</span>
                 </li>
             </ul>
         </div>
@@ -356,6 +348,13 @@ function copyQuestion(card) {
             usedQuestions.push(key);
             localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
         }
+
+        // Also update overview if it exists
+        document.querySelectorAll('.overview-icon').forEach(icon => {
+            if (icon.dataset.category === category && icon.dataset.title === title) {
+                icon.classList.add('overview-icon-used');
+            }
+        });
 
         // Add to history
         questionHistory.push({
@@ -438,6 +437,13 @@ function copyThermometerEnd(button, event) {
                 usedQuestions.push(key);
                 localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
             }
+
+            // Also update overview if it exists
+            document.querySelectorAll('.overview-icon').forEach(icon => {
+                if (icon.dataset.category === category && icon.dataset.title === title) {
+                    icon.classList.add('overview-icon-used');
+                }
+            });
 
             // Add to history
             questionHistory.push({
@@ -562,6 +568,15 @@ function switchView(view) {
     } else if (view === 'history') {
         historyView.classList.remove('hidden');
     }
+
+    // Update bottom nav active state
+    document.querySelectorAll('.bottom-nav-item').forEach(item => {
+        if (item.dataset.view === view) {
+            item.classList.add('active');
+        } else {
+            item.classList.remove('active');
+        }
+    });
 }
 
 /**
@@ -572,8 +587,7 @@ function renderHistory() {
     container.innerHTML = '';
 
     if (questionHistory.length === 0) {
-        container.innerHTML = '<p class="text-gray-500 text-center py-8">No questions asked yet</p>';
-        return;
+        return; // CSS ::before will show the empty message
     }
 
     // Show most recent first
@@ -628,22 +642,20 @@ function renderHistory() {
  * Renders the overview grid with all question icons
  */
 function renderOverview() {
-    const container = document.getElementById('overview-view');
+    const container = document.querySelector('#overview-view .overview-container');
 
     for (const [categoryKey, categoryData] of Object.entries(questionsData)) {
         const section = document.createElement('section');
 
         // Create header
         const header = document.createElement('div');
-        header.className = `${categoryKey}-header text-white p-3`;
-        header.style.borderRadius = '4px 4px 0 0';
+        header.className = `${categoryKey}-header text-white`;
         header.innerHTML = `<h2 class="text-lg font-bold tracking-wide uppercase">${categoryData.title}</h2>`;
         section.appendChild(header);
 
         // Create grid container
         const grid = document.createElement('div');
         grid.className = 'bg-white border-2 border-t-0 border-gray-200 p-3 grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2';
-        grid.style.borderRadius = '0 0 4px 4px';
 
         // Add all question icons
         categoryData.questions.forEach(group => {
