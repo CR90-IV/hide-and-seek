@@ -468,7 +468,7 @@ const questionsData = {
                         title: 'Structure with highest elevation from station',
                         question: 'Send a photo of the structure with highest angle of elevation from an entrance of your station.',
                         note: "Your choice of entrance; top + both sides, top in top 1/3 of frame; station building doesn't count unless building above has separate purpose",
-                        icon: 'domain'
+                        icon: 'apartment'
                     },
                     {
                         title: 'Any building visible from station',
@@ -591,4 +591,20 @@ const questionsData = {
             }
         ]
     }
+};
+
+// General rules data
+const rulesData = {
+    title: 'General Rules',
+    icon: 'rule',
+    rules: [
+        {
+            text: 'Treat locations outside map boundaries as if they don\'t exist.',
+            icon: 'radio_button_unchecked'
+        },
+        {
+            text: 'Seekers can only ask one question at a time, and must wait for an answer before asking the next question.',
+            icon: 'radio_button_unchecked'
+        }
+    ]
 };

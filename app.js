@@ -268,24 +268,38 @@ function createQuestionCard(categoryKey, categoryData, item) {
  */
 function createRulesSection() {
     const section = document.createElement('section');
-    section.innerHTML = `
-        <div class="bg-white border-2 border-gray-300 p-4 shadow-sm" style="border-radius: 4px;">
-            <h2 class="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide flex items-center">
-                <span class="material-symbols-outlined mr-2 text-xl">rule</span>
-                General Rules
-            </h2>
-            <ul class="space-y-2.5 text-base text-gray-700">
-                <li class="flex items-start gap-3">
-                    <span class="material-symbols-outlined text-lg text-gray-400">radio_button_unchecked</span>
-                    <span class="leading-relaxed">Treat locations outside map boundaries as if they don't exist.</span>
-                </li>
-                <li class="flex items-start gap-3">
-                    <span class="material-symbols-outlined text-lg text-gray-400">radio_button_unchecked</span>
-                    <span class="leading-relaxed">Seekers can only ask one question at a time, and must wait for an answer before asking the next question.</span>
-                </li>
-            </ul>
-        </div>
+
+    // Create container
+    const container = document.createElement('div');
+    container.className = 'bg-white border-2 border-gray-300 p-4 shadow-sm';
+    container.style.borderRadius = '4px';
+
+    // Create header
+    const header = document.createElement('h2');
+    header.className = 'text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide flex items-center';
+    header.innerHTML = `
+        <span class="material-symbols-outlined mr-2 text-xl">${rulesData.icon}</span>
+        ${rulesData.title}
     `;
+    container.appendChild(header);
+
+    // Create rules list
+    const list = document.createElement('ul');
+    list.className = 'space-y-2.5 text-base text-gray-700';
+
+    rulesData.rules.forEach(rule => {
+        const listItem = document.createElement('li');
+        listItem.className = 'flex items-start gap-3';
+        listItem.innerHTML = `
+            <span class="material-symbols-outlined text-lg text-gray-400">${rule.icon}</span>
+            <span class="leading-relaxed">${rule.text}</span>
+        `;
+        list.appendChild(listItem);
+    });
+
+    container.appendChild(list);
+    section.appendChild(container);
+
     return section;
 }
 
