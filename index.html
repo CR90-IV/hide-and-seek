@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hider Cheat Sheet</title>
+    <title>Hide and seek question sheet</title>
 
     <!-- External CDN Resources -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,7 +32,7 @@
     <header class="header-bar">
         <div class="header-content">
             <div class="flex-1">
-                <h1 class="header-title">Question sheet</h1>
+                <h1 class="header-title">Hide and seek question sheet</h1>
                 <p class="header-subtitle">Tap to copy question</p>
             </div>
             <button onclick="toggleSearch()" class="search-button" title="Search questions">
@@ -81,8 +81,15 @@
         <button id="undo-btn" class="undo-button hidden" onclick="undo()">UNDO</button>
     </div>
 
+    <!-- Overview View -->
+    <main id="overview-view" class="main-content">
+        <div class="overview-container">
+            <!-- Overview grid will be dynamically rendered here -->
+        </div>
+    </main>
+
     <!-- Detail View -->
-    <main id="normal-view" class="main-content">
+    <main id="normal-view" class="main-content hidden">
         <!-- Quick Jump Navigation -->
         <nav id="quick-jump" class="quick-jump hidden">
             <!-- Category dots will be dynamically rendered here -->
@@ -90,13 +97,6 @@
 
         <div id="questions-grid" class="questions-container">
             <!-- Questions will be dynamically rendered here -->
-        </div>
-    </main>
-
-    <!-- Overview View -->
-    <main id="overview-view" class="main-content hidden">
-        <div class="overview-container">
-            <!-- Overview grid will be dynamically rendered here -->
         </div>
     </main>
 
@@ -130,14 +130,16 @@
                 <h3 class="settings-section-title">Copy Behavior</h3>
                 <div class="settings-options">
                     <label class="settings-option">
-                        <input type="radio" name="whatsapp-mode" value="clipboard" checked onchange="setWhatsAppMode('clipboard')">
+                        <input type="radio" name="whatsapp-mode" value="clipboard" checked
+                            onchange="setWhatsAppMode('clipboard')">
                         <div class="settings-option-content">
                             <div class="settings-option-label">Copy to clipboard</div>
                             <div class="settings-option-description">Standard clipboard copy (default)</div>
                         </div>
                     </label>
                     <label class="settings-option">
-                        <input type="radio" name="whatsapp-mode" value="deeplink" onchange="setWhatsAppMode('deeplink')">
+                        <input type="radio" name="whatsapp-mode" value="deeplink"
+                            onchange="setWhatsAppMode('deeplink')">
                         <div class="settings-option-content">
                             <div class="settings-option-label">Open in WhatsApp</div>
                             <div class="settings-option-description">Opens WhatsApp with pre-filled message</div>
@@ -150,13 +152,13 @@
 
     <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
-        <button onclick="switchView('detail')" data-view="detail" class="bottom-nav-item active">
-            <span class="material-symbols-outlined">view_list</span>
-            <span class="bottom-nav-label">Detail</span>
-        </button>
-        <button onclick="switchView('overview')" data-view="overview" class="bottom-nav-item">
+        <button onclick="switchView('overview')" data-view="overview" class="bottom-nav-item active">
             <span class="material-symbols-outlined">grid_view</span>
             <span class="bottom-nav-label">Overview</span>
+        </button>
+        <button onclick="switchView('detail')" data-view="detail" class="bottom-nav-item">
+            <span class="material-symbols-outlined">view_list</span>
+            <span class="bottom-nav-label">Detail</span>
         </button>
         <button onclick="switchView('history')" data-view="history" class="bottom-nav-item">
             <span class="material-symbols-outlined">history</span>

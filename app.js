@@ -87,7 +87,7 @@ function getCategoryTextColor(categoryKey) {
         'radar': 'text-orange-100',
         'thermometer': 'text-yellow-100',
         'photo': 'text-blue-100',
-        'tentacle': 'text-purple-100'
+        'tentacle': 'text-white'
     };
     return colorMap[categoryKey] || 'text-gray-100';
 }
