@@ -38,14 +38,26 @@
             <button onclick="toggleSearch()" class="search-button" title="Search questions">
                 <span class="material-symbols-outlined">search</span>
             </button>
-            <button onclick="openSettings()" class="settings-button" title="Settings">
-                <span class="material-symbols-outlined">settings</span>
-            </button>
-            <button onclick="resetAll()" class="reset-button" title="Reset all questions">
-                <span class="material-symbols-outlined">refresh</span>
+            <button onclick="toggleOverflowMenu()" class="overflow-button" title="More options">
+                <span class="material-symbols-outlined">more_vert</span>
             </button>
         </div>
     </header>
+
+    <!-- Overflow Menu -->
+    <div id="overflow-menu" class="overflow-menu hidden">
+        <div class="overflow-backdrop" onclick="closeOverflowMenu()"></div>
+        <div class="overflow-content">
+            <button onclick="openSettings(); closeOverflowMenu();" class="overflow-item">
+                <span class="material-symbols-outlined">settings</span>
+                <span>Settings</span>
+            </button>
+            <button onclick="resetAll(); closeOverflowMenu();" class="overflow-item">
+                <span class="material-symbols-outlined">refresh</span>
+                <span>Reset all questions</span>
+            </button>
+        </div>
+    </div>
 
     <!-- Search Bar -->
     <div id="search-container" class="search-container hidden">
@@ -71,6 +83,11 @@
 
     <!-- Detail View -->
     <main id="normal-view" class="main-content">
+        <!-- Quick Jump Navigation -->
+        <nav id="quick-jump" class="quick-jump hidden">
+            <!-- Category dots will be dynamically rendered here -->
+        </nav>
+
         <div id="questions-grid" class="questions-container">
             <!-- Questions will be dynamically rendered here -->
         </div>

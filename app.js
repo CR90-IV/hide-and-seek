@@ -93,6 +93,26 @@ function getCategoryTextColor(categoryKey) {
 }
 
 /* ============================================
+   OVERFLOW MENU FUNCTIONS
+   ============================================ */
+
+/**
+ * Toggles the overflow menu visibility
+ */
+function toggleOverflowMenu() {
+    const menu = document.getElementById('overflow-menu');
+    menu.classList.toggle('hidden');
+}
+
+/**
+ * Closes the overflow menu
+ */
+function closeOverflowMenu() {
+    const menu = document.getElementById('overflow-menu');
+    menu.classList.add('hidden');
+}
+
+/* ============================================
    SETTINGS FUNCTIONS
    ============================================ */
 
@@ -1020,6 +1040,72 @@ function copyQuestionFromOverview(card) {
 }
 
 /* ============================================
+   QUICK JUMP NAVIGATION
+   ============================================ */
+
+/**
+ * Renders the quick jump navigation dots
+ */
+function renderQuickJump() {
+    const quickJump = document.getElementById('quick-jump');
+    quickJump.innerHTML = '';
+
+    const categories = ['matching', 'measuring', 'radar', 'thermometer', 'photo', 'tentacle'];
+
+    categories.forEach((categoryKey, index) => {
+        const dot = document.createElement('button');
+        dot.className = 'quick-jump-dot';
+        dot.dataset.category = categoryKey;
+        dot.title = questionsData[categoryKey].title;
+        dot.setAttribute('aria-label', `Jump to ${questionsData[categoryKey].title}`);
+        dot.addEventListener('click', () => scrollToCategory(index));
+        quickJump.appendChild(dot);
+    });
+}
+
+/**
+ * Scrolls to a specific category section
+ * @param {number} index - The index of the category section
+ */
+function scrollToCategory(index) {
+    const sections = document.querySelectorAll('#questions-grid > section');
+    if (sections[index]) {
+        sections[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Highlight the active dot
+        document.querySelectorAll('.quick-jump-dot').forEach((dot, i) => {
+            if (i === index) {
+                dot.classList.add('active');
+                setTimeout(() => dot.classList.remove('active'), 600);
+            }
+        });
+    }
+}
+
+/**
+ * Updates quick jump dot highlights based on scroll position
+ */
+function updateQuickJumpHighlight() {
+    const sections = document.querySelectorAll('#questions-grid > section');
+    const scrollPosition = window.scrollY + 100;
+
+    let activeIndex = 0;
+    sections.forEach((section, index) => {
+        if (section.offsetTop <= scrollPosition) {
+            activeIndex = index;
+        }
+    });
+
+    document.querySelectorAll('.quick-jump-dot').forEach((dot, index) => {
+        if (index === activeIndex) {
+            dot.classList.add('active');
+        } else {
+            dot.classList.remove('active');
+        }
+    });
+}
+
+/* ============================================
    VIEW MANAGEMENT
    ============================================ */
 
@@ -1030,6 +1116,7 @@ function switchView(view) {
     const normalView = document.getElementById('normal-view');
     const overviewView = document.getElementById('overview-view');
     const historyView = document.getElementById('history-view');
+    const quickJump = document.getElementById('quick-jump');
 
     // Hide all views
     normalView.classList.add('hidden');
@@ -1039,10 +1126,13 @@ function switchView(view) {
     // Show selected view
     if (view === 'detail') {
         normalView.classList.remove('hidden');
+        quickJump.classList.remove('hidden');
     } else if (view === 'overview') {
         overviewView.classList.remove('hidden');
+        quickJump.classList.add('hidden');
     } else if (view === 'history') {
         historyView.classList.remove('hidden');
+        quickJump.classList.add('hidden');
     }
 
     // Update bottom nav active state
@@ -1053,6 +1143,58 @@ function switchView(view) {
             item.classList.remove('active');
         }
     });
+}
+
+/**
+ * Copies a question from history
+ * @param {Object} item - The history item containing question data
+ */
+function copyFromHistory(item) {
+    // Find the full question data
+    let answer = '';
+    let note = '';
+    let reward = '';
+
+    for (const [categoryKey, categoryData] of Object.entries(questionsData)) {
+        if (categoryData.title === item.category) {
+            answer = categoryData.answer;
+            reward = categoryData.reward;
+
+            categoryData.questions.forEach(group => {
+                group.items.forEach(q => {
+                    if (q.title === item.title) {
+                        answer = q.answer || categoryData.answer;
+                        note = q.note || '';
+                    }
+                });
+            });
+            break;
+        }
+    }
+
+    // Build WhatsApp-formatted message
+    let message = `*${item.category}: ${item.title}*\n`;
+    message += `${item.question}\n`;
+    message += `Answer: ${answer}\n`;
+    if (note) {
+        const plainTextNote = convertLinksToPlainText(note);
+        message += `_${plainTextNote}_\n`;
+    }
+    message += `Reward: ${reward}`;
+
+    // Handle copy based on whatsappMode
+    if (whatsappMode === 'deeplink') {
+        const encodedMessage = encodeURIComponent(message);
+        window.location.href = `https://wa.me/?text=${encodedMessage}`;
+        showToast('OPENING WHATSAPP', false);
+    } else {
+        navigator.clipboard.writeText(message).then(() => {
+            showToast('COPIED TO CLIPBOARD', false);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            alert('Failed to copy to clipboard');
+        });
+    }
 }
 
 /**
@@ -1071,7 +1213,7 @@ function renderHistory() {
 
     reversedHistory.forEach((item, index) => {
         const historyItem = document.createElement('div');
-        historyItem.className = 'border-b border-gray-200 last:border-0 py-3';
+        historyItem.className = 'history-item';
 
         const date = new Date(item.timestamp);
         const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -1099,16 +1241,25 @@ function renderHistory() {
                 <div class="icon-shape ${categoryKey}-card flex-shrink-0">
                     <span class="material-symbols-outlined text-2xl">${iconName}</span>
                 </div>
-                <div class="flex-1">
+                <div class="flex-1 min-w-0">
                     <p class="font-semibold text-gray-900">${item.category}: ${item.title}</p>
                     <p class="text-sm text-gray-600 mt-1">${item.question}</p>
-                </div>
-                <div class="text-right text-sm text-gray-500 flex-shrink-0">
-                    <div>${timeStr}</div>
-                    <div class="text-xs">${dateStr}</div>
+                    <div class="flex items-center gap-2 mt-2">
+                        <button class="history-copy-btn">
+                            <span class="material-symbols-outlined">content_copy</span>
+                            <span>Copy</span>
+                        </button>
+                        <div class="text-xs text-gray-500">
+                            ${timeStr} • ${dateStr}
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
+
+        // Add click handler to copy button
+        const copyBtn = historyItem.querySelector('.history-copy-btn');
+        copyBtn.addEventListener('click', () => copyFromHistory(item));
 
         container.appendChild(historyItem);
     });
@@ -1233,6 +1384,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAllQuestions();
     renderOverview();
     renderHistory();
+    renderQuickJump();
 
     // Add search event listeners
     const searchInput = document.getElementById('search-input');
@@ -1246,13 +1398,42 @@ document.addEventListener('DOMContentLoaded', () => {
         clearSearch();
     });
 
-    // Close settings modal with Escape key
+    // Add scroll listener for quick jump highlight
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const normalView = document.getElementById('normal-view');
+            if (!normalView.classList.contains('hidden')) {
+                updateQuickJumpHighlight();
+            }
+        }, 100);
+    });
+
+    // Close modals with Escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
-            const modal = document.getElementById('settings-modal');
-            if (!modal.classList.contains('hidden')) {
+            const settingsModal = document.getElementById('settings-modal');
+            const overflowMenu = document.getElementById('overflow-menu');
+
+            if (!settingsModal.classList.contains('hidden')) {
                 closeSettings();
             }
+            if (!overflowMenu.classList.contains('hidden')) {
+                closeOverflowMenu();
+            }
+        }
+    });
+
+    // Close overflow menu when clicking outside
+    document.addEventListener('click', (e) => {
+        const overflowMenu = document.getElementById('overflow-menu');
+        const overflowButton = document.querySelector('.overflow-button');
+
+        if (!overflowMenu.classList.contains('hidden') &&
+            !overflowMenu.contains(e.target) &&
+            !overflowButton.contains(e.target)) {
+            closeOverflowMenu();
         }
     });
 
