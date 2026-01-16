@@ -6,6 +6,17 @@
 const usedQuestions = JSON.parse(localStorage.getItem('usedQuestions') || '[]');
 const questionHistory = JSON.parse(localStorage.getItem('questionHistory') || '[]');
 
+// Load WhatsApp mode setting from localStorage
+let whatsappMode = localStorage.getItem('whatsappMode') || 'clipboard';
+
+// Search state
+let searchActive = false;
+let searchQuery = '';
+let searchDebounceTimer = null;
+
+// Undo state
+let lastAction = null;
+
 /* ============================================
    UTILITY FUNCTIONS
    ============================================ */
@@ -34,17 +45,36 @@ function convertLinksToPlainText(html) {
 }
 
 /**
- * Shows toast notification for 2 seconds
+ * Shows toast notification
+ * @param {string} message - The message to display (default: 'COPIED TO CLIPBOARD')
+ * @param {boolean} showUndo - Whether to show the undo button (default: false)
  */
-function showToast() {
+function showToast(message = 'COPIED TO CLIPBOARD', showUndo = false) {
     const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toast-text');
+    const undoBtn = document.getElementById('undo-btn');
+
+    // Update the message
+    toastText.textContent = message;
+
+    // Show/hide undo button
+    if (showUndo) {
+        undoBtn.classList.remove('hidden');
+        toast.classList.add('toast-with-undo');
+    } else {
+        undoBtn.classList.add('hidden');
+        toast.classList.remove('toast-with-undo');
+    }
+
     toast.classList.remove('hidden');
     toast.classList.add('toast');
 
+    // Set timeout based on whether undo is shown
+    const duration = showUndo ? 4000 : 2000;
     setTimeout(() => {
         toast.classList.add('hidden');
-        toast.classList.remove('toast');
-    }, 2000);
+        toast.classList.remove('toast', 'toast-with-undo');
+    }, duration);
 }
 
 /**
@@ -60,6 +90,242 @@ function getCategoryTextColor(categoryKey) {
         'tentacle': 'text-purple-100'
     };
     return colorMap[categoryKey] || 'text-gray-100';
+}
+
+/* ============================================
+   SETTINGS FUNCTIONS
+   ============================================ */
+
+/**
+ * Opens the settings modal
+ */
+function openSettings() {
+    const modal = document.getElementById('settings-modal');
+    modal.classList.remove('hidden');
+
+    // Set the current mode in the radio buttons
+    const radioButtons = document.querySelectorAll('input[name="whatsapp-mode"]');
+    radioButtons.forEach(radio => {
+        radio.checked = radio.value === whatsappMode;
+    });
+}
+
+/**
+ * Closes the settings modal
+ */
+function closeSettings() {
+    const modal = document.getElementById('settings-modal');
+    modal.classList.add('hidden');
+}
+
+/**
+ * Sets the WhatsApp mode and saves to localStorage
+ * @param {string} mode - 'clipboard' or 'deeplink'
+ */
+function setWhatsAppMode(mode) {
+    whatsappMode = mode;
+    localStorage.setItem('whatsappMode', mode);
+}
+
+/* ============================================
+   UNDO FUNCTION
+   ============================================ */
+
+/**
+ * Undoes the last copy action
+ */
+function undo() {
+    if (!lastAction) {
+        return;
+    }
+
+    const { key, category, title } = lastAction;
+
+    // Remove from usedQuestions
+    const index = usedQuestions.indexOf(key);
+    if (index > -1) {
+        usedQuestions.splice(index, 1);
+        localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
+    }
+
+    // Remove last item from questionHistory
+    if (questionHistory.length > 0) {
+        questionHistory.pop();
+        localStorage.setItem('questionHistory', JSON.stringify(questionHistory));
+        renderHistory();
+    }
+
+    // Update visual states across all views
+    // Detail view
+    document.querySelectorAll('.question-card, .thermometer-card').forEach(card => {
+        if (card.dataset.category === category && card.dataset.title === title) {
+            card.classList.remove('card-used');
+        }
+    });
+
+    // Overview view
+    document.querySelectorAll('.overview-card').forEach(overviewCard => {
+        if (overviewCard.dataset.category === category && overviewCard.dataset.title === title) {
+            overviewCard.classList.remove('overview-card-used');
+            // Remove checkmark
+            const checkmark = overviewCard.querySelector('.overview-checkmark');
+            if (checkmark) {
+                checkmark.remove();
+            }
+        }
+    });
+
+    // Clear lastAction
+    lastAction = null;
+
+    // Hide toast
+    const toast = document.getElementById('toast');
+    toast.classList.add('hidden');
+    toast.classList.remove('toast', 'toast-with-undo');
+}
+
+/* ============================================
+   SEARCH FUNCTIONS
+   ============================================ */
+
+/**
+ * Toggles the search bar visibility
+ */
+function toggleSearch() {
+    const searchContainer = document.getElementById('search-container');
+    const searchInput = document.getElementById('search-input');
+    const currentView = document.querySelector('.main-content:not(.hidden)').id;
+
+    searchActive = !searchActive;
+
+    if (searchActive) {
+        searchContainer.classList.remove('hidden');
+
+        // Check if we're in detail view
+        if (currentView !== 'normal-view') {
+            showSearchMessage('Switch to Detail view to search questions');
+        } else {
+            hideSearchMessage();
+            // Focus the input for immediate typing
+            setTimeout(() => searchInput.focus(), 100);
+        }
+    } else {
+        searchContainer.classList.add('hidden');
+        clearSearch();
+    }
+}
+
+/**
+ * Handles search input with debouncing
+ * @param {string} query - The search query
+ */
+function handleSearch(query) {
+    searchQuery = query;
+
+    // Clear existing timer
+    if (searchDebounceTimer) {
+        clearTimeout(searchDebounceTimer);
+    }
+
+    // Debounce the search
+    searchDebounceTimer = setTimeout(() => {
+        filterQuestions(query);
+    }, 150);
+}
+
+/**
+ * Filters questions based on search query
+ * @param {string} query - The search query
+ */
+function filterQuestions(query) {
+    const normalizedQuery = query.toLowerCase().trim();
+
+    if (!normalizedQuery) {
+        // Show all questions
+        document.querySelectorAll('.question-card, .thermometer-card').forEach(card => {
+            card.style.display = '';
+        });
+        document.querySelectorAll('#questions-grid > section').forEach(section => {
+            section.style.display = '';
+        });
+        updateSearchCount(0, 0);
+        return;
+    }
+
+    let totalQuestions = 0;
+    let matchingQuestions = 0;
+
+    // Filter cards
+    document.querySelectorAll('.question-card, .thermometer-card').forEach(card => {
+        totalQuestions++;
+        const title = card.dataset.title?.toLowerCase() || '';
+        const question = card.dataset.question?.toLowerCase() || '';
+
+        if (title.includes(normalizedQuery) || question.includes(normalizedQuery)) {
+            card.style.display = '';
+            matchingQuestions++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    // Hide empty sections
+    document.querySelectorAll('#questions-grid > section').forEach(section => {
+        const visibleCards = section.querySelectorAll('.question-card:not([style*="display: none"]), .thermometer-card:not([style*="display: none"])');
+        if (visibleCards.length === 0) {
+            section.style.display = 'none';
+        } else {
+            section.style.display = '';
+        }
+    });
+
+    updateSearchCount(matchingQuestions, totalQuestions);
+}
+
+/**
+ * Updates the search results count
+ * @param {number} matching - Number of matching questions
+ * @param {number} total - Total number of questions
+ */
+function updateSearchCount(matching, total) {
+    const countElement = document.getElementById('search-results-count');
+
+    if (matching === 0 && total === 0) {
+        countElement.textContent = '';
+    } else if (matching === 0) {
+        countElement.textContent = 'No questions found';
+    } else {
+        countElement.textContent = `Found ${matching} question${matching !== 1 ? 's' : ''}`;
+    }
+}
+
+/**
+ * Clears the search and shows all questions
+ */
+function clearSearch() {
+    const searchInput = document.getElementById('search-input');
+    searchInput.value = '';
+    searchQuery = '';
+    filterQuestions('');
+    hideSearchMessage();
+}
+
+/**
+ * Shows a message in the search bar
+ * @param {string} message - The message to show
+ */
+function showSearchMessage(message) {
+    const messageElement = document.getElementById('search-message');
+    messageElement.textContent = message;
+    messageElement.classList.remove('hidden');
+}
+
+/**
+ * Hides the search message
+ */
+function hideSearchMessage() {
+    const messageElement = document.getElementById('search-message');
+    messageElement.classList.add('hidden');
 }
 
 /* ============================================
@@ -328,9 +594,14 @@ function copyQuestion(card) {
         }
 
         // Also update overview if it exists
-        document.querySelectorAll('.overview-icon').forEach(icon => {
-            if (icon.dataset.category === category && icon.dataset.title === title) {
-                icon.classList.remove('overview-icon-used');
+        document.querySelectorAll('.overview-card').forEach(overviewCard => {
+            if (overviewCard.dataset.category === category && overviewCard.dataset.title === title) {
+                overviewCard.classList.remove('overview-card-used');
+                // Remove checkmark
+                const checkmark = overviewCard.querySelector('.overview-checkmark');
+                if (checkmark) {
+                    checkmark.remove();
+                }
             }
         });
 
@@ -352,8 +623,12 @@ function copyQuestion(card) {
     }
     message += `Reward: ${reward}`;
 
-    // Copy to clipboard
-    navigator.clipboard.writeText(message).then(() => {
+    // Handle copy based on whatsappMode
+    if (whatsappMode === 'deeplink') {
+        // Open WhatsApp with pre-filled message
+        const encodedMessage = encodeURIComponent(message);
+        window.location.href = `https://wa.me/?text=${encodedMessage}`;
+
         // Mark as used
         card.classList.add('card-used');
 
@@ -364,9 +639,17 @@ function copyQuestion(card) {
         }
 
         // Also update overview if it exists
-        document.querySelectorAll('.overview-icon').forEach(icon => {
-            if (icon.dataset.category === category && icon.dataset.title === title) {
-                icon.classList.add('overview-icon-used');
+        document.querySelectorAll('.overview-card').forEach(overviewCard => {
+            if (overviewCard.dataset.category === category && overviewCard.dataset.title === title) {
+                overviewCard.classList.add('overview-card-used');
+                // Add checkmark if not already present
+                const iconWrapper = overviewCard.querySelector('.overview-card-icon-wrapper');
+                if (iconWrapper && !overviewCard.querySelector('.overview-checkmark')) {
+                    const checkmark = document.createElement('span');
+                    checkmark.className = 'overview-checkmark material-symbols-outlined';
+                    checkmark.textContent = 'check_circle';
+                    iconWrapper.appendChild(checkmark);
+                }
             }
         });
 
@@ -380,12 +663,60 @@ function copyQuestion(card) {
         localStorage.setItem('questionHistory', JSON.stringify(questionHistory));
         renderHistory();
 
-        // Show toast
-        showToast();
-    }).catch(err => {
-        console.error('Failed to copy:', err);
-        alert('Failed to copy to clipboard');
-    });
+        // Show toast (no undo for WhatsApp mode)
+        showToast('OPENING WHATSAPP', false);
+    } else {
+        // Copy to clipboard
+        navigator.clipboard.writeText(message).then(() => {
+            // Mark as used
+            card.classList.add('card-used');
+
+            // Save to localStorage
+            if (!usedQuestions.includes(key)) {
+                usedQuestions.push(key);
+                localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
+            }
+
+            // Also update overview if it exists
+            document.querySelectorAll('.overview-card').forEach(overviewCard => {
+                if (overviewCard.dataset.category === category && overviewCard.dataset.title === title) {
+                    overviewCard.classList.add('overview-card-used');
+                    // Add checkmark if not already present
+                    const iconWrapper = overviewCard.querySelector('.overview-card-icon-wrapper');
+                    if (iconWrapper && !overviewCard.querySelector('.overview-checkmark')) {
+                        const checkmark = document.createElement('span');
+                        checkmark.className = 'overview-checkmark material-symbols-outlined';
+                        checkmark.textContent = 'check_circle';
+                        iconWrapper.appendChild(checkmark);
+                    }
+                }
+            });
+
+            // Add to history
+            questionHistory.push({
+                category,
+                title,
+                question,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('questionHistory', JSON.stringify(questionHistory));
+            renderHistory();
+
+            // Set lastAction for undo
+            lastAction = {
+                key,
+                category,
+                title,
+                timestamp: Date.now()
+            };
+
+            // Show toast with undo button
+            showToast('COPIED TO CLIPBOARD', true);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            alert('Failed to copy to clipboard');
+        });
+    }
 }
 
 /**
@@ -440,7 +771,12 @@ function copyThermometerEnd(button, event) {
     }
     message += `Reward: ${reward}`;
 
-    navigator.clipboard.writeText(message).then(() => {
+    // Handle copy based on whatsappMode
+    if (whatsappMode === 'deeplink') {
+        // Open WhatsApp with pre-filled message
+        const encodedMessage = encodeURIComponent(message);
+        window.location.href = `https://wa.me/?text=${encodedMessage}`;
+
         // Mark card as used
         if (card) {
             card.classList.add('card-used');
@@ -453,9 +789,17 @@ function copyThermometerEnd(button, event) {
             }
 
             // Also update overview if it exists
-            document.querySelectorAll('.overview-icon').forEach(icon => {
-                if (icon.dataset.category === category && icon.dataset.title === title) {
-                    icon.classList.add('overview-icon-used');
+            document.querySelectorAll('.overview-card').forEach(overviewCard => {
+                if (overviewCard.dataset.category === category && overviewCard.dataset.title === title) {
+                    overviewCard.classList.add('overview-card-used');
+                    // Add checkmark if not already present
+                    const iconWrapper = overviewCard.querySelector('.overview-card-icon-wrapper');
+                    if (iconWrapper && !overviewCard.querySelector('.overview-checkmark')) {
+                        const checkmark = document.createElement('span');
+                        checkmark.className = 'overview-checkmark material-symbols-outlined';
+                        checkmark.textContent = 'check_circle';
+                        iconWrapper.appendChild(checkmark);
+                    }
                 }
             });
 
@@ -470,24 +814,80 @@ function copyThermometerEnd(button, event) {
             renderHistory();
         }
 
-        showToast();
-    }).catch(err => {
-        console.error('Failed to copy:', err);
-        alert('Failed to copy to clipboard');
-    });
+        showToast('OPENING WHATSAPP', false);
+    } else {
+        // Copy to clipboard
+        navigator.clipboard.writeText(message).then(() => {
+            // Mark card as used
+            if (card) {
+                card.classList.add('card-used');
+
+                // Save to localStorage
+                const key = category + ':' + title;
+                if (!usedQuestions.includes(key)) {
+                    usedQuestions.push(key);
+                    localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
+                }
+
+                // Also update overview if it exists
+                document.querySelectorAll('.overview-card').forEach(overviewCard => {
+                    if (overviewCard.dataset.category === category && overviewCard.dataset.title === title) {
+                        overviewCard.classList.add('overview-card-used');
+                        // Add checkmark if not already present
+                        const iconWrapper = overviewCard.querySelector('.overview-card-icon-wrapper');
+                        if (iconWrapper && !overviewCard.querySelector('.overview-checkmark')) {
+                            const checkmark = document.createElement('span');
+                            checkmark.className = 'overview-checkmark material-symbols-outlined';
+                            checkmark.textContent = 'check_circle';
+                            iconWrapper.appendChild(checkmark);
+                        }
+                    }
+                });
+
+                // Add to history
+                questionHistory.push({
+                    category,
+                    title,
+                    question,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('questionHistory', JSON.stringify(questionHistory));
+                renderHistory();
+
+                // Set lastAction for undo
+                lastAction = {
+                    key,
+                    category,
+                    title,
+                    timestamp: Date.now()
+                };
+            }
+
+            showToast('COPIED TO CLIPBOARD', true);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            alert('Failed to copy to clipboard');
+        });
+    }
 }
 
 /**
  * Copies question from overview mode and marks as used
  */
-function copyQuestionFromOverview(iconWrapper) {
-    const category = iconWrapper.dataset.category;
-    const title = iconWrapper.dataset.title;
+function copyQuestionFromOverview(card) {
+    const category = card.dataset.category;
+    const title = card.dataset.title;
     const key = category + ':' + title;
 
     // Check if already used - if so, toggle it back to unused
-    if (iconWrapper.classList.contains('overview-icon-used')) {
-        iconWrapper.classList.remove('overview-icon-used');
+    if (card.classList.contains('overview-card-used')) {
+        card.classList.remove('overview-card-used');
+
+        // Remove checkmark
+        const checkmark = card.querySelector('.overview-checkmark');
+        if (checkmark) {
+            checkmark.remove();
+        }
 
         // Remove from usedQuestions
         const index = usedQuestions.indexOf(key);
@@ -496,20 +896,20 @@ function copyQuestionFromOverview(iconWrapper) {
             localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
         }
 
-        // Also update the normal view
-        document.querySelectorAll('.question-card, .thermometer-card').forEach(card => {
-            if (card.dataset.category === category && card.dataset.title === title) {
-                card.classList.remove('card-used');
+        // Also update the detail view
+        document.querySelectorAll('.question-card, .thermometer-card').forEach(detailCard => {
+            if (detailCard.dataset.category === category && detailCard.dataset.title === title) {
+                detailCard.classList.remove('card-used');
             }
         });
 
         return; // Don't copy to clipboard
     }
 
-    const question = iconWrapper.dataset.question;
-    const answer = iconWrapper.dataset.answer;
-    const note = iconWrapper.dataset.note;
-    const reward = iconWrapper.dataset.reward;
+    const question = card.dataset.question;
+    const answer = card.dataset.answer;
+    const note = card.dataset.note;
+    const reward = card.dataset.reward;
 
     // Build WhatsApp-formatted message with full question
     let message = `*${category}: ${title}*\n`;
@@ -521,10 +921,23 @@ function copyQuestionFromOverview(iconWrapper) {
     }
     message += `Reward: ${reward}`;
 
-    // Copy to clipboard
-    navigator.clipboard.writeText(message).then(() => {
+    // Handle copy based on whatsappMode
+    if (whatsappMode === 'deeplink') {
+        // Open WhatsApp with pre-filled message
+        const encodedMessage = encodeURIComponent(message);
+        window.location.href = `https://wa.me/?text=${encodedMessage}`;
+
         // Mark as used
-        iconWrapper.classList.add('overview-icon-used');
+        card.classList.add('overview-card-used');
+
+        // Add checkmark
+        const iconWrapper = card.querySelector('.overview-card-icon-wrapper');
+        if (iconWrapper && !card.querySelector('.overview-checkmark')) {
+            const checkmark = document.createElement('span');
+            checkmark.className = 'overview-checkmark material-symbols-outlined';
+            checkmark.textContent = 'check_circle';
+            iconWrapper.appendChild(checkmark);
+        }
 
         // Save to localStorage
         if (!usedQuestions.includes(key)) {
@@ -542,19 +955,68 @@ function copyQuestionFromOverview(iconWrapper) {
         localStorage.setItem('questionHistory', JSON.stringify(questionHistory));
         renderHistory();
 
-        // Also update the normal view
-        document.querySelectorAll('.question-card, .thermometer-card').forEach(card => {
-            if (card.dataset.category === category && card.dataset.title === title) {
-                card.classList.add('card-used');
+        // Also update the detail view
+        document.querySelectorAll('.question-card, .thermometer-card').forEach(detailCard => {
+            if (detailCard.dataset.category === category && detailCard.dataset.title === title) {
+                detailCard.classList.add('card-used');
             }
         });
 
-        // Show toast
-        showToast();
-    }).catch(err => {
-        console.error('Failed to copy:', err);
-        alert('Failed to copy to clipboard');
-    });
+        // Show toast (no undo for WhatsApp mode)
+        showToast('OPENING WHATSAPP', false);
+    } else {
+        // Copy to clipboard
+        navigator.clipboard.writeText(message).then(() => {
+            // Mark as used
+            card.classList.add('overview-card-used');
+
+            // Add checkmark
+            const iconWrapper = card.querySelector('.overview-card-icon-wrapper');
+            if (iconWrapper && !card.querySelector('.overview-checkmark')) {
+                const checkmark = document.createElement('span');
+                checkmark.className = 'overview-checkmark material-symbols-outlined';
+                checkmark.textContent = 'check_circle';
+                iconWrapper.appendChild(checkmark);
+            }
+
+            // Save to localStorage
+            if (!usedQuestions.includes(key)) {
+                usedQuestions.push(key);
+                localStorage.setItem('usedQuestions', JSON.stringify(usedQuestions));
+            }
+
+            // Add to history
+            questionHistory.push({
+                category,
+                title,
+                question,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('questionHistory', JSON.stringify(questionHistory));
+            renderHistory();
+
+            // Also update the detail view
+            document.querySelectorAll('.question-card, .thermometer-card').forEach(detailCard => {
+                if (detailCard.dataset.category === category && detailCard.dataset.title === title) {
+                    detailCard.classList.add('card-used');
+                }
+            });
+
+            // Set lastAction for undo
+            lastAction = {
+                key,
+                category,
+                title,
+                timestamp: Date.now()
+            };
+
+            // Show toast with undo button
+            showToast('COPIED TO CLIPBOARD', true);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            alert('Failed to copy to clipboard');
+        });
+    }
 }
 
 /* ============================================
@@ -653,7 +1115,7 @@ function renderHistory() {
 }
 
 /**
- * Renders the overview grid with all question icons
+ * Renders the overview grid with all question cards (icon + title)
  */
 function renderOverview() {
     const container = document.querySelector('#overview-view .overview-container');
@@ -661,50 +1123,73 @@ function renderOverview() {
     for (const [categoryKey, categoryData] of Object.entries(questionsData)) {
         const section = document.createElement('section');
 
-        // Create header
+        // Create category header
         const header = document.createElement('div');
-        header.className = `${categoryKey}-header text-white`;
+        header.className = `${categoryKey}-header text-white p-3`;
+        header.style.borderRadius = '4px 4px 0 0';
         header.innerHTML = `<h2 class="text-lg font-bold tracking-wide uppercase">${categoryData.title}</h2>`;
         section.appendChild(header);
 
-        // Create grid container
-        const grid = document.createElement('div');
-        grid.className = 'bg-white border-2 border-t-0 border-gray-200 p-3 grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2';
+        // Create content container
+        const content = document.createElement('div');
+        content.className = 'bg-white border-2 border-t-0 border-gray-200 p-3';
+        content.style.borderRadius = '0 0 4px 4px';
 
-        // Add all question icons
+        // Add all question groups with subcategories
         categoryData.questions.forEach(group => {
+            // Add subcategory header if exists
+            if (group.subcategory) {
+                const subcategoryHeader = document.createElement('div');
+                subcategoryHeader.className = 'overview-subcategory';
+                subcategoryHeader.innerHTML = `
+                    <span class="w-2 h-2 rounded-full bg-current mr-2"></span>
+                    ${group.subcategory}
+                `;
+                content.appendChild(subcategoryHeader);
+            }
+
+            // Create grid for this subcategory
+            const grid = document.createElement('div');
+            grid.className = 'overview-grid';
+
             group.items.forEach(item => {
-                const iconWrapper = document.createElement('div');
-                iconWrapper.className = `overview-icon cursor-pointer transition-all flex items-center justify-center`;
-                iconWrapper.style.aspectRatio = '1';
-                iconWrapper.title = item.title;
+                const card = document.createElement('div');
+                card.className = `overview-card ${categoryKey}-card cursor-pointer transition-all`;
 
                 // Set data attributes
-                iconWrapper.dataset.category = categoryData.title;
-                iconWrapper.dataset.title = item.title;
-                iconWrapper.dataset.question = item.question;
-                iconWrapper.dataset.answer = item.answer || categoryData.answer;
-                iconWrapper.dataset.note = item.note || '';
-                iconWrapper.dataset.reward = categoryData.reward;
+                card.dataset.category = categoryData.title;
+                card.dataset.title = item.title;
+                card.dataset.question = item.question;
+                card.dataset.answer = item.answer || categoryData.answer;
+                card.dataset.note = item.note || '';
+                card.dataset.reward = categoryData.reward;
 
                 // Check if used
                 const key = categoryData.title + ':' + item.title;
-                if (usedQuestions.includes(key)) {
-                    iconWrapper.classList.add('overview-icon-used');
+                const isUsed = usedQuestions.includes(key);
+                if (isUsed) {
+                    card.classList.add('overview-card-used');
                 }
 
-                iconWrapper.innerHTML = `
-                    <div class="icon-shape ${categoryKey}-card">
-                        <span class="material-symbols-outlined text-2xl">${item.icon}</span>
+                card.innerHTML = `
+                    <div class="overview-card-icon-wrapper">
+                        <div class="icon-shape ${categoryKey}-card">
+                            <span class="material-symbols-outlined">${item.icon}</span>
+                        </div>
+                        ${isUsed ? '<span class="overview-checkmark material-symbols-outlined">check_circle</span>' : ''}
                     </div>
+                    <div class="overview-card-title">${item.title}</div>
                 `;
-                iconWrapper.addEventListener('click', () => copyQuestionFromOverview(iconWrapper));
 
-                grid.appendChild(iconWrapper);
+                card.addEventListener('click', () => copyQuestionFromOverview(card));
+
+                grid.appendChild(card);
             });
+
+            content.appendChild(grid);
         });
 
-        section.appendChild(grid);
+        section.appendChild(content);
         container.appendChild(section);
     }
 }
@@ -723,8 +1208,13 @@ function resetAll() {
         document.querySelectorAll('.thermometer-card').forEach(card => {
             card.classList.remove('card-used');
         });
-        document.querySelectorAll('.overview-icon').forEach(icon => {
-            icon.classList.remove('overview-icon-used');
+        document.querySelectorAll('.overview-card').forEach(overviewCard => {
+            overviewCard.classList.remove('overview-card-used');
+            // Remove checkmark if present
+            const checkmark = overviewCard.querySelector('.overview-checkmark');
+            if (checkmark) {
+                checkmark.remove();
+            }
         });
 
         // Clear history
@@ -743,4 +1233,37 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAllQuestions();
     renderOverview();
     renderHistory();
+
+    // Add search event listeners
+    const searchInput = document.getElementById('search-input');
+    const clearSearchBtn = document.getElementById('clear-search');
+
+    searchInput.addEventListener('input', (e) => {
+        handleSearch(e.target.value);
+    });
+
+    clearSearchBtn.addEventListener('click', () => {
+        clearSearch();
+    });
+
+    // Close settings modal with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('settings-modal');
+            if (!modal.classList.contains('hidden')) {
+                closeSettings();
+            }
+        }
+    });
+
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js', { scope: './' })
+            .then((registration) => {
+                console.log('Service Worker registered successfully:', registration.scope);
+            })
+            .catch((error) => {
+                console.error('Service Worker registration failed:', error);
+            });
+    }
 });

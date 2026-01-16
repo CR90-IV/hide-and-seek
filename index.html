@@ -16,6 +16,15 @@
 
     <!-- Local Styles -->
     <link rel="stylesheet" href="styles.css">
+
+    <!-- PWA Support -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#111827">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Hider">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
 </head>
 
 <body class="bg-gray-50 min-h-screen">
@@ -26,16 +35,38 @@
                 <h1 class="header-title">Question sheet</h1>
                 <p class="header-subtitle">Tap to copy question</p>
             </div>
+            <button onclick="toggleSearch()" class="search-button" title="Search questions">
+                <span class="material-symbols-outlined">search</span>
+            </button>
+            <button onclick="openSettings()" class="settings-button" title="Settings">
+                <span class="material-symbols-outlined">settings</span>
+            </button>
             <button onclick="resetAll()" class="reset-button" title="Reset all questions">
                 <span class="material-symbols-outlined">refresh</span>
             </button>
         </div>
     </header>
 
+    <!-- Search Bar -->
+    <div id="search-container" class="search-container hidden">
+        <div class="search-bar">
+            <span class="material-symbols-outlined search-icon">search</span>
+            <input type="text" id="search-input" placeholder="Search questions..." aria-label="Search questions">
+            <button id="clear-search" class="clear-search-btn" title="Clear search">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="search-results-count" class="search-results-count"></div>
+        <div id="search-message" class="search-message hidden"></div>
+    </div>
+
     <!-- Toast notification -->
     <div id="toast" class="toast-notification">
-        <span class="material-symbols-outlined text-lg align-middle mr-2">check_circle</span>
-        COPIED TO CLIPBOARD
+        <span class="toast-message">
+            <span class="material-symbols-outlined text-lg align-middle mr-2">check_circle</span>
+            <span id="toast-text">COPIED TO CLIPBOARD</span>
+        </span>
+        <button id="undo-btn" class="undo-button hidden" onclick="undo()">UNDO</button>
     </div>
 
     <!-- Detail View -->
@@ -64,6 +95,41 @@
             </div>
         </div>
     </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="settings-modal hidden">
+        <div class="settings-backdrop" onclick="closeSettings()"></div>
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2 class="settings-title">
+                    <span class="material-symbols-outlined align-middle mr-2">settings</span>
+                    Settings
+                </h2>
+                <button onclick="closeSettings()" class="settings-close-btn" title="Close settings">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="settings-body">
+                <h3 class="settings-section-title">Copy Behavior</h3>
+                <div class="settings-options">
+                    <label class="settings-option">
+                        <input type="radio" name="whatsapp-mode" value="clipboard" checked onchange="setWhatsAppMode('clipboard')">
+                        <div class="settings-option-content">
+                            <div class="settings-option-label">Copy to clipboard</div>
+                            <div class="settings-option-description">Standard clipboard copy (default)</div>
+                        </div>
+                    </label>
+                    <label class="settings-option">
+                        <input type="radio" name="whatsapp-mode" value="deeplink" onchange="setWhatsAppMode('deeplink')">
+                        <div class="settings-option-content">
+                            <div class="settings-option-label">Open in WhatsApp</div>
+                            <div class="settings-option-description">Opens WhatsApp with pre-filled message</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
