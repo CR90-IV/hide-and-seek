@@ -1,16 +1,13 @@
-const CACHE_NAME = 'hider-cheat-sheet-v1';
+const CACHE_NAME = 'hider-cheat-sheet-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './app.js',
   './questions-data.js',
   './styles.css',
   './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  'https://cdn.tailwindcss.com',
-  'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
-  'https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap'
+  './js/app.js'
+  // Note: Icons omitted (don't exist yet)
+  // Note: CDN resources and ES6 module dependencies will be cached on-demand during fetch
 ];
 
 // Install event - cache assets
@@ -60,7 +57,8 @@ self.addEventListener('fetch', (event) => {
         return fetch(event.request)
           .then((response) => {
             // Don't cache if not a valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
+            // Allow both 'basic' (same-origin) and 'cors' (CDN resources) types
+            if (!response || response.status !== 200 || (response.type !== 'basic' && response.type !== 'cors')) {
               return response;
             }
 

@@ -1,5 +1,5 @@
 // Question data structure
-const questionsData = {
+export const questionsData = {
     matching: {
         color: '#232F41',
         title: 'MATCHING',

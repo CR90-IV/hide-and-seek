@@ -24,7 +24,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Hider">
-    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    <!-- TODO: Add apple-touch-icon when icons are created -->
 </head>
 
 <body class="bg-gray-50 min-h-screen">
@@ -32,13 +32,13 @@
     <header class="header-bar">
         <div class="header-content">
             <div class="flex-1">
-                <h1 class="header-title">Hide and seek question sheet</h1>
+                <h1 class="header-title">Hide and seek</h1>
                 <p class="header-subtitle">Tap to copy question</p>
             </div>
-            <button onclick="toggleSearch()" class="search-button" title="Search questions">
+            <button onclick="window.hiderApp?.toggleSearch()" class="search-button" title="Search questions">
                 <span class="material-symbols-outlined">search</span>
             </button>
-            <button onclick="toggleOverflowMenu()" class="overflow-button" title="More options">
+            <button onclick="window.hiderApp?.toggleOverflowMenu()" class="overflow-button" title="More options">
                 <span class="material-symbols-outlined">more_vert</span>
             </button>
         </div>
@@ -46,13 +46,14 @@
 
     <!-- Overflow Menu -->
     <div id="overflow-menu" class="overflow-menu hidden">
-        <div class="overflow-backdrop" onclick="closeOverflowMenu()"></div>
+        <div class="overflow-backdrop" onclick="window.hiderApp?.closeOverflowMenu()"></div>
         <div class="overflow-content">
-            <button onclick="openSettings(); closeOverflowMenu();" class="overflow-item">
+            <button onclick="window.hiderApp?.openSettings(); window.hiderApp?.closeOverflowMenu();"
+                class="overflow-item">
                 <span class="material-symbols-outlined">settings</span>
                 <span>Settings</span>
             </button>
-            <button onclick="resetAll(); closeOverflowMenu();" class="overflow-item">
+            <button onclick="window.hiderApp?.resetAll(); window.hiderApp?.closeOverflowMenu();" class="overflow-item">
                 <span class="material-symbols-outlined">refresh</span>
                 <span>Reset all questions</span>
             </button>
@@ -78,18 +79,11 @@
             <span class="material-symbols-outlined text-lg align-middle mr-2">check_circle</span>
             <span id="toast-text">COPIED TO CLIPBOARD</span>
         </span>
-        <button id="undo-btn" class="undo-button hidden" onclick="undo()">UNDO</button>
+        <button id="undo-btn" class="undo-button hidden">UNDO</button>
     </div>
 
-    <!-- Overview View -->
-    <main id="overview-view" class="main-content">
-        <div class="overview-container">
-            <!-- Overview grid will be dynamically rendered here -->
-        </div>
-    </main>
-
     <!-- Detail View -->
-    <main id="normal-view" class="main-content hidden">
+    <main id="normal-view" class="main-content">
         <!-- Quick Jump Navigation -->
         <nav id="quick-jump" class="quick-jump hidden">
             <!-- Category dots will be dynamically rendered here -->
@@ -97,6 +91,13 @@
 
         <div id="questions-grid" class="questions-container">
             <!-- Questions will be dynamically rendered here -->
+        </div>
+    </main>
+
+    <!-- Overview View -->
+    <main id="overview-view" class="main-content hidden">
+        <div class="overview-container">
+            <!-- Overview grid will be dynamically rendered here -->
         </div>
     </main>
 
@@ -115,14 +116,14 @@
 
     <!-- Settings Modal -->
     <div id="settings-modal" class="settings-modal hidden">
-        <div class="settings-backdrop" onclick="closeSettings()"></div>
+        <div class="settings-backdrop" onclick="window.hiderApp?.closeSettings()"></div>
         <div class="settings-content">
             <div class="settings-header">
                 <h2 class="settings-title">
                     <span class="material-symbols-outlined align-middle mr-2">settings</span>
                     Settings
                 </h2>
-                <button onclick="closeSettings()" class="settings-close-btn" title="Close settings">
+                <button onclick="window.hiderApp?.closeSettings()" class="settings-close-btn" title="Close settings">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
@@ -130,16 +131,14 @@
                 <h3 class="settings-section-title">Copy Behavior</h3>
                 <div class="settings-options">
                     <label class="settings-option">
-                        <input type="radio" name="whatsapp-mode" value="clipboard" checked
-                            onchange="setWhatsAppMode('clipboard')">
+                        <input type="radio" name="whatsapp-mode" value="clipboard" checked>
                         <div class="settings-option-content">
                             <div class="settings-option-label">Copy to clipboard</div>
                             <div class="settings-option-description">Standard clipboard copy (default)</div>
                         </div>
                     </label>
                     <label class="settings-option">
-                        <input type="radio" name="whatsapp-mode" value="deeplink"
-                            onchange="setWhatsAppMode('deeplink')">
+                        <input type="radio" name="whatsapp-mode" value="deeplink">
                         <div class="settings-option-content">
                             <div class="settings-option-label">Open in WhatsApp</div>
                             <div class="settings-option-description">Opens WhatsApp with pre-filled message</div>
@@ -152,23 +151,22 @@
 
     <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
-        <button onclick="switchView('overview')" data-view="overview" class="bottom-nav-item active">
-            <span class="material-symbols-outlined">grid_view</span>
-            <span class="bottom-nav-label">Overview</span>
-        </button>
-        <button onclick="switchView('detail')" data-view="detail" class="bottom-nav-item">
+        <button data-view="detail" class="bottom-nav-item active">
             <span class="material-symbols-outlined">view_list</span>
             <span class="bottom-nav-label">Detail</span>
         </button>
-        <button onclick="switchView('history')" data-view="history" class="bottom-nav-item">
+        <button data-view="overview" class="bottom-nav-item">
+            <span class="material-symbols-outlined">grid_view</span>
+            <span class="bottom-nav-label">Overview</span>
+        </button>
+        <button data-view="history" class="bottom-nav-item">
             <span class="material-symbols-outlined">history</span>
             <span class="bottom-nav-label">History</span>
         </button>
     </nav>
 
     <!-- External JavaScript (load in order) -->
-    <script src="questions-data.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="js/app.js"></script>
 </body>
 
 </html>
