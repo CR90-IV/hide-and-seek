@@ -1,171 +1,164 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="govuk-template">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hide and seek question sheet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Questions – Hide and seek</title>
 
-    <!-- External CDN Resources -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
-
-    <!-- Local Styles -->
+    <!-- GOV.UK Frontend 6.6.0, compiled with Arial (GDS Transport is for GOV.UK only) -->
+    <link rel="stylesheet" href="vendor/govuk-frontend/govuk-frontend.min.css">
     <link rel="stylesheet" href="styles.css">
 
     <!-- PWA Support -->
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#111827">
+    <meta name="theme-color" content="#0b0c0c">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Hider">
-    <!-- TODO: Add apple-touch-icon when icons are created -->
 </head>
 
-<body class="bg-gray-50 min-h-screen">
+<body class="govuk-template__body">
+    <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
+
     <!-- Header -->
-    <header class="header-bar">
-        <div class="header-content">
-            <div class="flex-1">
-                <h1 class="header-title">Hide and seek</h1>
-                <p class="header-subtitle">Tap to copy question</p>
+    <header class="govuk-generic-header" role="banner">
+        <div class="govuk-generic-header__container govuk-width-container">
+            <div class="govuk-generic-header__logo">
+                <a href="#questions" class="govuk-generic-header__homepage-link">Hide and seek</a>
             </div>
-            <button onclick="window.hiderApp?.toggleSearch()" class="search-button" title="Search questions">
-                <span class="material-symbols-outlined">search</span>
-            </button>
-            <button onclick="window.hiderApp?.toggleOverflowMenu()" class="overflow-button" title="More options">
-                <span class="material-symbols-outlined">more_vert</span>
-            </button>
         </div>
     </header>
 
-    <!-- Overflow Menu -->
-    <div id="overflow-menu" class="overflow-menu hidden">
-        <div class="overflow-backdrop" onclick="window.hiderApp?.closeOverflowMenu()"></div>
-        <div class="overflow-content">
-            <button onclick="window.hiderApp?.openSettings(); window.hiderApp?.closeOverflowMenu();"
-                class="overflow-item">
-                <span class="material-symbols-outlined">settings</span>
-                <span>Settings</span>
-            </button>
-            <button onclick="window.hiderApp?.resetAll(); window.hiderApp?.closeOverflowMenu();" class="overflow-item">
-                <span class="material-symbols-outlined">refresh</span>
-                <span>Reset all questions</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Search Bar -->
-    <div id="search-container" class="search-container hidden">
-        <div class="search-bar">
-            <span class="material-symbols-outlined search-icon">search</span>
-            <input type="text" id="search-input" placeholder="Search questions..." aria-label="Search questions">
-            <button id="clear-search" class="clear-search-btn" title="Clear search">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        </div>
-        <div id="search-results-count" class="search-results-count"></div>
-        <div id="search-message" class="search-message hidden"></div>
-    </div>
-
-    <!-- Toast notification -->
-    <div id="toast" class="toast-notification">
-        <span class="toast-message">
-            <span class="material-symbols-outlined text-lg align-middle mr-2">check_circle</span>
-            <span id="toast-text">COPIED TO CLIPBOARD</span>
-        </span>
-        <button id="undo-btn" class="undo-button hidden">UNDO</button>
-    </div>
-
-    <!-- Detail View -->
-    <main id="normal-view" class="main-content">
-        <!-- Quick Jump Navigation -->
-        <nav id="quick-jump" class="quick-jump hidden">
-            <!-- Category dots will be dynamically rendered here -->
-        </nav>
-
-        <div id="questions-grid" class="questions-container">
-            <!-- Questions will be dynamically rendered here -->
-        </div>
-    </main>
-
-    <!-- Overview View -->
-    <main id="overview-view" class="main-content hidden">
-        <div class="overview-container">
-            <!-- Overview grid will be dynamically rendered here -->
-        </div>
-    </main>
-
-    <!-- History View -->
-    <main id="history-view" class="main-content hidden">
-        <div class="history-container">
-            <div class="history-header">
-                <span class="material-symbols-outlined mr-2 text-2xl">history</span>
-                <h2>Question History</h2>
-            </div>
-            <div id="history-list" class="history-list">
-                <!-- History items will be rendered here -->
+    <!-- Service navigation -->
+    <section aria-label="Service information" class="govuk-service-navigation app-service-navigation">
+        <div class="govuk-width-container">
+            <div class="govuk-service-navigation__container">
+                <nav aria-label="Menu" class="govuk-service-navigation__wrapper">
+                    <ul class="govuk-service-navigation__list" id="navigation">
+                        <li class="govuk-service-navigation__item" data-view="detail">
+                            <a class="govuk-service-navigation__link" href="#questions">Questions</a>
+                        </li>
+                        <li class="govuk-service-navigation__item" data-view="overview">
+                            <a class="govuk-service-navigation__link" href="#overview">Overview</a>
+                        </li>
+                        <li class="govuk-service-navigation__item" data-view="history">
+                            <a class="govuk-service-navigation__link" href="#history">History</a>
+                        </li>
+                        <li class="govuk-service-navigation__item" data-view="settings">
+                            <a class="govuk-service-navigation__link" href="#settings">Settings</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
-    </main>
+    </section>
 
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="settings-modal hidden">
-        <div class="settings-backdrop" onclick="window.hiderApp?.closeSettings()"></div>
-        <div class="settings-content">
-            <div class="settings-header">
-                <h2 class="settings-title">
-                    <span class="material-symbols-outlined align-middle mr-2">settings</span>
-                    Settings
-                </h2>
-                <button onclick="window.hiderApp?.closeSettings()" class="settings-close-btn" title="Close settings">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
+    <div class="govuk-width-container">
+        <main class="govuk-main-wrapper" id="main-content">
+
+            <!-- Search (Questions and Overview only) -->
+            <div id="search-container" class="govuk-form-group app-search" role="search">
+                <label class="govuk-label govuk-label--s" for="search-input">Search questions</label>
+                <div class="app-search__row">
+                    <input class="govuk-input" id="search-input" name="search" type="search"
+                        spellcheck="false" autocomplete="off">
+                    <button type="button" id="clear-search" class="govuk-button govuk-button--secondary app-search__clear">
+                        Clear
+                    </button>
+                </div>
+                <p id="search-results-count" class="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-0" aria-live="polite"></p>
             </div>
-            <div class="settings-body">
-                <h3 class="settings-section-title">Copy Behavior</h3>
-                <div class="settings-options">
-                    <label class="settings-option">
-                        <input type="radio" name="whatsapp-mode" value="clipboard" checked>
-                        <div class="settings-option-content">
-                            <div class="settings-option-label">Copy to clipboard</div>
-                            <div class="settings-option-description">Standard clipboard copy (default)</div>
-                        </div>
-                    </label>
-                    <label class="settings-option">
-                        <input type="radio" name="whatsapp-mode" value="deeplink">
-                        <div class="settings-option-content">
-                            <div class="settings-option-label">Open in WhatsApp</div>
-                            <div class="settings-option-description">Opens WhatsApp with pre-filled message</div>
-                        </div>
-                    </label>
+
+            <!-- Questions view -->
+            <div id="normal-view" class="app-view">
+                <h1 class="govuk-heading-xl">Questions</h1>
+                <p class="govuk-body-l">Select a question to copy it. The question is then marked as asked.</p>
+
+                <nav id="quick-jump" class="app-contents" aria-label="Contents">
+                    <!-- Contents list is rendered here -->
+                </nav>
+
+                <div id="questions-grid">
+                    <!-- Questions are rendered here -->
                 </div>
             </div>
+
+            <!-- Overview view -->
+            <div id="overview-view" class="app-view hidden">
+                <h1 class="govuk-heading-xl">Overview</h1>
+                <p class="govuk-body">All questions on one page. Select a question to copy it, or select it again to mark it as not asked.</p>
+                <div class="overview-container">
+                    <!-- Overview is rendered here -->
+                </div>
+            </div>
+
+            <!-- History view -->
+            <div id="history-view" class="app-view hidden">
+                <h1 class="govuk-heading-xl">History</h1>
+                <p class="govuk-body">Questions you copied, most recent first.</p>
+                <div id="history-list" class="history-list">
+                    <!-- History is rendered here -->
+                </div>
+                <button type="button" id="clear-history" class="govuk-button govuk-button--secondary">
+                    Clear history
+                </button>
+            </div>
+
+            <!-- Settings view -->
+            <div id="settings-view" class="app-view hidden">
+                <h1 class="govuk-heading-xl">Settings</h1>
+
+                <div class="govuk-form-group">
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            <h2 class="govuk-fieldset__heading">What happens when you select a question?</h2>
+                        </legend>
+                        <div class="govuk-radios" data-module="govuk-radios">
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="whatsapp-mode" name="whatsapp-mode" type="radio"
+                                    value="clipboard" aria-describedby="whatsapp-mode-hint" checked>
+                                <label class="govuk-label govuk-radios__label" for="whatsapp-mode">Copy to clipboard</label>
+                                <div id="whatsapp-mode-hint" class="govuk-hint govuk-radios__hint">This is the default.</div>
+                            </div>
+                            <div class="govuk-radios__item">
+                                <input class="govuk-radios__input" id="whatsapp-mode-2" name="whatsapp-mode" type="radio"
+                                    value="deeplink" aria-describedby="whatsapp-mode-2-hint">
+                                <label class="govuk-label govuk-radios__label" for="whatsapp-mode-2">Open in WhatsApp</label>
+                                <div id="whatsapp-mode-2-hint" class="govuk-hint govuk-radios__hint">Opens WhatsApp with the message filled in.</div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <h2 class="govuk-heading-m">Start a new game</h2>
+                <div class="govuk-warning-text">
+                    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                    <strong class="govuk-warning-text__text">
+                        <span class="govuk-visually-hidden">Warning</span>
+                        This marks all questions as not asked and deletes your history.
+                    </strong>
+                </div>
+                <button type="button" id="reset-all" class="govuk-button govuk-button--warning">
+                    Reset all questions
+                </button>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Copy confirmation (notification banner, fixed to the bottom of the screen) -->
+    <div id="toast" class="govuk-notification-banner govuk-notification-banner--success app-toast hidden"
+        role="status" aria-live="polite">
+        <div class="govuk-notification-banner__content app-toast__content">
+            <p class="govuk-notification-banner__heading app-toast__text" id="toast-text">Copied to clipboard</p>
+            <button type="button" id="undo-btn" class="govuk-button govuk-button--secondary app-toast__undo hidden">
+                Undo
+            </button>
         </div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
-    <nav class="bottom-nav">
-        <button data-view="detail" class="bottom-nav-item active">
-            <span class="material-symbols-outlined">view_list</span>
-            <span class="bottom-nav-label">Detail</span>
-        </button>
-        <button data-view="overview" class="bottom-nav-item">
-            <span class="material-symbols-outlined">grid_view</span>
-            <span class="bottom-nav-label">Overview</span>
-        </button>
-        <button data-view="history" class="bottom-nav-item">
-            <span class="material-symbols-outlined">history</span>
-            <span class="bottom-nav-label">History</span>
-        </button>
-    </nav>
-
-    <!-- External JavaScript (load in order) -->
     <script type="module" src="js/app.js"></script>
 </body>
 

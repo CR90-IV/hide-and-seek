@@ -1,155 +1,73 @@
-import { throttle } from '../../utils/debounce.js';
+import { sentenceCase } from '../../utils/dom.js';
 
 /**
- * QuickJump - Category navigation component
+ * QuickJump - "Contents" list of links to each category section
  *
- * Provides quick navigation dots for jumping to categories
- * with scroll position tracking
+ * Follows the GOV.UK contents list pattern. Each link goes to the
+ * section with id "category-<key>", rendered by DetailRenderer.
  */
 export class QuickJump {
   #element;
   #questionsData;
-  #gridSelector;
-  #categories = ['matching', 'measuring', 'radar', 'thermometer', 'photo', 'tentacle'];
-  #throttledUpdate;
 
   /**
-   * Create a new QuickJump component
-   * @param {string} elementId - ID of the quick jump container
+   * @param {string} elementId - ID of the contents container
    * @param {object} questionsData - The questions data structure
-   * @param {string} gridSelector - Selector for the questions grid (default: '#questions-grid')
    */
-  constructor(elementId, questionsData, gridSelector = '#questions-grid') {
+  constructor(elementId, questionsData) {
     this.#element = document.getElementById(elementId);
     this.#questionsData = questionsData;
-    this.#gridSelector = gridSelector;
 
     if (!this.#element) {
       console.error(`QuickJump: Element with ID "${elementId}" not found`);
       return;
     }
 
-    // Create throttled update function (100ms)
-    this.#throttledUpdate = throttle(this.#updateHighlight.bind(this), 100);
-
     this.render();
-    this.#attachScrollListener();
+    this.#element.addEventListener('click', this.#handleClick);
   }
 
-  /* ============================================
-     PUBLIC API
-     ============================================ */
-
-  /**
-   * Render the quick jump navigation dots
-   */
   render() {
-    this.#element.innerHTML = '';
+    const links = Object.entries(this.#questionsData)
+      .map(([key, data]) => `<li><a class="govuk-link" href="#category-${key}">${sentenceCase(data.title)}</a></li>`)
+      .join('');
 
-    this.#categories.forEach((categoryKey, index) => {
-      const categoryData = this.#questionsData[categoryKey];
-      if (!categoryData) return;
-
-      const dot = document.createElement('button');
-      dot.className = 'quick-jump-dot';
-      dot.dataset.category = categoryKey;
-      dot.title = categoryData.title;
-      dot.setAttribute('aria-label', `Jump to ${categoryData.title}`);
-
-      dot.addEventListener('click', () => this.#scrollToCategory(index));
-
-      this.#element.appendChild(dot);
-    });
-
-    // Initial highlight update
-    this.#updateHighlight();
+    this.#element.innerHTML = `
+      <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Contents</h2>
+      <ol class="govuk-body app-contents__list">
+        ${links}
+        <li><a class="govuk-link" href="#category-rules">General rules</a></li>
+      </ol>
+    `;
   }
 
-  /**
-   * Show the quick jump component
-   */
   show() {
     this.#element.classList.remove('hidden');
   }
 
-  /**
-   * Hide the quick jump component
-   */
   hide() {
     this.#element.classList.add('hidden');
   }
 
   /**
-   * Update highlight based on current scroll position
+   * Scroll to the section without changing the URL hash,
+   * because the hash selects the view.
    */
-  updateHighlight() {
-    this.#updateHighlight();
-  }
-
-  /* ============================================
-     PRIVATE METHODS
-     ============================================ */
-
-  /**
-   * Scroll to a specific category section
-   * @private
-   * @param {number} index - The index of the category section
-   */
-  #scrollToCategory(index) {
-    const sections = document.querySelectorAll(`${this.#gridSelector} > section`);
-
-    if (sections[index]) {
-      sections[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-      // Highlight the active dot temporarily
-      const dots = this.#element.querySelectorAll('.quick-jump-dot');
-      dots.forEach((dot, i) => {
-        if (i === index) {
-          dot.classList.add('active');
-          setTimeout(() => this.#updateHighlight(), 600);
-        }
-      });
+  #handleClick = (event) => {
+    const link = event.target.closest('a[href^="#category-"]');
+    if (!link) return;
+    const target = document.getElementById(link.getAttribute('href').slice(1));
+    if (!target) return;
+    event.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const heading = target.querySelector('h2');
+    if (heading) {
+      heading.setAttribute('tabindex', '-1');
+      heading.focus({ preventScroll: true });
     }
-  }
+  };
 
-  /**
-   * Update dot highlights based on scroll position
-   * @private
-   */
-  #updateHighlight() {
-    const sections = document.querySelectorAll(`${this.#gridSelector} > section`);
-    const scrollPosition = window.scrollY + 100;
-
-    let activeIndex = 0;
-    sections.forEach((section, index) => {
-      if (section.offsetTop <= scrollPosition) {
-        activeIndex = index;
-      }
-    });
-
-    // Update dot active states
-    const dots = this.#element.querySelectorAll('.quick-jump-dot');
-    dots.forEach((dot, index) => {
-      if (index === activeIndex) {
-        dot.classList.add('active');
-      } else {
-        dot.classList.remove('active');
-      }
-    });
-  }
-
-  /**
-   * Attach scroll event listener
-   * @private
-   */
-  #attachScrollListener() {
-    window.addEventListener('scroll', this.#throttledUpdate);
-  }
-
-  /**
-   * Detach scroll event listener (cleanup)
-   */
   destroy() {
-    window.removeEventListener('scroll', this.#throttledUpdate);
+    this.#element.removeEventListener('click', this.#handleClick);
   }
 }

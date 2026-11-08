@@ -100,20 +100,15 @@ export function appendChildren(parent, children) {
 }
 
 /**
- * Get category text color class for headers
- * @param {string} categoryKey - The category key (e.g., 'matching')
- * @returns {string} Tailwind color class
+ * Convert an all-capitals label to sentence case (GOV.UK style)
+ * Labels with lower-case letters do not change.
+ * @param {string} text - The text (e.g. 'MATCHING', 'YES / NO')
+ * @returns {string} Sentence case text (e.g. 'Matching', 'Yes / no')
  */
-export function getCategoryTextColor(categoryKey) {
-  const colorMap = {
-    'matching': 'text-gray-200',
-    'measuring': 'text-green-100',
-    'radar': 'text-orange-100',
-    'thermometer': 'text-yellow-100',
-    'photo': 'text-blue-100',
-    'tentacle': 'text-white'
-  };
-  return colorMap[categoryKey] || 'text-gray-100';
+export function sentenceCase(text) {
+  if (!text || text !== text.toUpperCase()) return text;
+  const lower = text.toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
 }
 
 /**
@@ -125,17 +120,4 @@ export function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
-}
-
-/**
- * Create a Material Symbol icon span
- * @param {string} iconName - The icon name
- * @param {string[]} classes - Additional classes
- * @returns {HTMLElement} The icon element
- */
-export function createIcon(iconName, classes = []) {
-  return createElement('span', {
-    classes: ['material-symbols-outlined', ...classes],
-    text: iconName
-  });
 }

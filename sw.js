@@ -1,13 +1,14 @@
-const CACHE_NAME = 'hider-cheat-sheet-v3';
+const CACHE_NAME = 'hider-cheat-sheet-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './questions-data.js',
   './styles.css',
+  './vendor/govuk-frontend/govuk-frontend.min.css',
   './manifest.json',
   './js/app.js'
   // Note: Icons omitted (don't exist yet)
-  // Note: CDN resources and ES6 module dependencies will be cached on-demand during fetch
+  // Note: ES6 module dependencies are cached on demand during fetch
 ];
 
 // Install event - cache assets
