@@ -1,14 +1,15 @@
 import { EventDelegator } from '../../utils/events.js';
-import { sentenceCase } from '../../utils/dom.js';
+import { sentenceCase, setCategoryColours, iconBoxHTML, updateProgress } from '../../utils/dom.js';
 
 /**
  * DetailRenderer - Renders the Questions view in the GOV.UK Design System style
  *
  * Each category is a section with:
- * - a heading with the category colour as a left border
- * - grey tags for the answer type, time and reward
+ * - a band in the category colour: icon, heading, progress count,
+ *   question pattern and tags (answer type, time and reward)
  * - inset text for the category note
- * - a task list where each row is a question (button) with an "Asked" status
+ * - a task list where each row has an icon in the category colour,
+ *   the question (button) and an "Asked" status. Asked rows are grey.
  *
  * Event delegation: one listener on the container handles all rows and buttons.
  */
@@ -116,16 +117,22 @@ export class DetailRenderer {
     section.className = 'app-category';
     section.id = `category-${categoryKey}`;
     section.dataset.categoryKey = categoryKey;
-    section.style.setProperty('--app-category-colour', categoryData.color);
+    setCategoryColours(section, categoryData);
 
     const tagsHTML = categoryData.badges
-      .map(badge => `<strong class="govuk-tag govuk-tag--grey">${sentenceCase(badge)}</strong>`)
+      .map(badge => `<strong class="govuk-tag">${sentenceCase(badge)}</strong>`)
       .join('');
 
     section.innerHTML = `
-      <h2 class="govuk-heading-l app-category__heading">${sentenceCase(categoryData.title)}</h2>
-      <p class="govuk-body">${categoryData.description}</p>
-      <div class="app-category__tags">${tagsHTML}</div>
+      <div class="app-band">
+        <div class="app-band__title-row">
+          <span class="app-icon" aria-hidden="true">${categoryData.icon || 'help'}</span>
+          <h2 class="govuk-heading-l app-band__heading">${sentenceCase(categoryData.title)}</h2>
+          <span class="app-band__progress"></span>
+        </div>
+        <p class="govuk-body-l app-band__description">${categoryData.description}</p>
+        <div class="app-band__tags">${tagsHTML}</div>
+      </div>
       ${categoryData.note ? `<div class="govuk-inset-text">${categoryData.note}</div>` : ''}
     `;
 
@@ -173,6 +180,7 @@ export class DetailRenderer {
     const hint = item.note || item.subtitle || '';
 
     row.innerHTML = `
+      ${iconBoxHTML(item.icon)}
       <div class="govuk-task-list__name-and-hint">
         <button type="button" class="govuk-task-list__link app-question__button"
                 aria-describedby="${hint ? `${id}-hint ` : ''}${id}-status">${item.title}</button>
@@ -191,8 +199,9 @@ export class DetailRenderer {
     this.#setRowData(row, categoryData, item);
 
     row.innerHTML = `
+      ${iconBoxHTML(item.icon)}
       <div class="govuk-task-list__name-and-hint">
-        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0">${item.title}</p>
+        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0 app-thermometer__title">${item.title}</p>
         ${item.note ? `<div class="govuk-task-list__hint">${item.note}</div>` : ''}
         <div class="app-thermometer__actions">
           <button type="button" class="govuk-button govuk-button--secondary thermometer-btn start-btn"
@@ -216,7 +225,7 @@ export class DetailRenderer {
     section.className = 'app-category';
     section.id = 'category-rules';
     section.innerHTML = `
-      <h2 class="govuk-heading-l app-category__heading">General rules</h2>
+      <h2 class="govuk-heading-l">General rules</h2>
       <ul class="govuk-list govuk-list--bullet">
         <li>Ask questions one at a time.</li>
         <li>Hiders must answer truthfully.</li>
@@ -235,7 +244,7 @@ export class DetailRenderer {
     row.classList.toggle('app-question--used', isUsed);
     const status = row.querySelector('.govuk-task-list__status');
     if (status) {
-      status.innerHTML = isUsed ? '<strong class="govuk-tag govuk-tag--green">Asked</strong>' : '';
+      status.innerHTML = isUsed ? '<strong class="govuk-tag govuk-tag--grey">Asked</strong>' : '';
     }
   }
 
@@ -244,6 +253,7 @@ export class DetailRenderer {
     this.#container.querySelectorAll('.app-question').forEach(row => {
       this.#setRowUsed(row, usedQuestions.has(`${row.dataset.category}:${row.dataset.title}`));
     });
+    updateProgress(this.#container, '.app-question', 'app-question--used');
   }
 
   #updateCardUsedState(category, title, isUsed) {
@@ -252,6 +262,7 @@ export class DetailRenderer {
         this.#setRowUsed(row, isUsed);
       }
     });
+    updateProgress(this.#container, '.app-question', 'app-question--used');
   }
 
   /* ============================================

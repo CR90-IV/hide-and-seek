@@ -83,29 +83,134 @@
 }
 
 /* ============================================
-   CATEGORY SECTIONS
-   The category colour matches the physical cards in the game
+   ICONS (Material Symbols subset, see vendor/material-symbols)
+   ============================================ */
+@font-face {
+    font-family: "Material Symbols Outlined";
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url("vendor/material-symbols/material-symbols-subset.woff2") format("woff2");
+}
+
+.app-icon {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    direction: ltr;
+    font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Square in the category colour that holds a question icon */
+.app-icon-box {
+    position: relative;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--app-category-colour, #0b0c0c);
+    color: var(--app-category-text-colour, #ffffff);
+}
+
+/* ============================================
+   CATEGORY BANDS
+   Full-width band in the category colour. The colours match the
+   physical cards in the game. --app-category-text-colour gives
+   4.5:1 contrast or more on each colour.
    ============================================ */
 .app-category {
     margin-bottom: 50px;
     scroll-margin-top: 15px;
 }
 
-.app-category__heading {
-    border-left: 10px solid var(--app-category-colour, #0b0c0c);
-    padding-left: 15px;
+.app-band {
+    margin: 0 -15px 20px;
+    padding: 20px 15px;
+    background-color: var(--app-category-colour, #0b0c0c);
+    color: var(--app-category-text-colour, #ffffff);
 }
 
-.app-category__tags {
+@media (min-width: 40.0625em) {
+    .app-band {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 20px;
+    }
+}
+
+.app-band--compact {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 15px;
+}
+
+.app-band__title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.app-band__title-row .app-icon {
+    font-size: 32px;
+}
+
+.app-band__heading {
+    margin: 0;
+    color: inherit;
+}
+
+.app-band__progress {
+    margin-left: auto;
+    font-family: arial, sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    white-space: nowrap;
+}
+
+.app-band__description {
+    margin: 10px 0 12px;
+    color: inherit;
+}
+
+.app-band__tags {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
-    margin-bottom: 20px;
+}
+
+.app-band__tags .govuk-tag {
+    background-color: #ffffff;
+    color: #0b0c0c;
 }
 
 /* ============================================
-   QUESTION ROWS (task list with buttons)
+   QUESTION ROWS (task list with icon and button)
    ============================================ */
+.app-question.govuk-task-list__item {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.app-question .govuk-task-list__status {
+    margin-left: auto;
+}
+
+.app-question .govuk-task-list__name-and-hint {
+    flex: 1;
+    min-width: 0;
+    padding-top: 8px;
+}
+
 .app-question__button {
     margin: 0;
     padding: 0;
@@ -139,8 +244,27 @@
     z-index: 1;
 }
 
-.app-question--used .app-question__button {
+.app-question .govuk-task-list__status {
+    padding-top: 8px;
+}
+
+/* Asked questions are grey and less prominent, but still selectable */
+.app-question--used .app-icon-box {
+    background-color: #eeefef;
+    color: #6f7071;
+}
+
+.app-question--used .app-question__button,
+.app-question--used .app-thermometer__title {
     color: var(--govuk-secondary-text-colour, #484949);
+}
+
+.app-question--used .app-question__button {
+    text-decoration-color: #b1b4b6;
+}
+
+.app-question--used .govuk-task-list__hint {
+    color: #6f7071;
 }
 
 /* Thermometer rows: title, then Start and End buttons */
@@ -156,7 +280,7 @@
 }
 
 /* ============================================
-   OVERVIEW (compact grid of secondary buttons)
+   OVERVIEW (grid of icon tiles)
    ============================================ */
 .app-overview-category {
     margin-bottom: 30px;
@@ -164,36 +288,58 @@
 
 .app-overview-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 10px;
     margin-bottom: 20px;
 }
 
-.app-overview-grid .govuk-button {
+@media (min-width: 40.0625em) {
+    .app-overview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+}
+
+.app-overview-card.govuk-button {
+    position: relative;
     width: 100%;
-    margin: 0;
     min-height: 100%;
+    margin: 0;
+    padding: 10px 6px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    line-height: 1.2;
+}
+
+.app-overview-card .app-icon-box {
+    width: 40px;
+    height: 40px;
 }
 
 .app-overview-card--used.govuk-button {
-    background-color: var(--app-category-colour, #0f7a52);
-    color: #ffffff;
-    box-shadow: 0 2px 0 #0b0c0c;
+    background-color: #ffffff;
+    color: var(--govuk-secondary-text-colour, #484949);
+    box-shadow: 0 2px 0 #cecece;
 }
 
-.app-overview-card--used.govuk-button::after {
-    content: " ✓";
+.app-overview-card--used .app-icon-box {
+    background-color: #eeefef;
+    color: #6f7071;
+}
+
+.app-overview-card__tick {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 18px;
+    color: #6f7071;
 }
 
 .app-overview-card--used.govuk-button:focus:not(:active):not(:hover) {
     background-color: var(--govuk-focus-colour, #ffdd00);
     color: var(--govuk-focus-text-colour, #0b0c0c);
-}
-
-/* Light category colours need dark text */
-.app-overview-category[data-category-key="thermometer"] .app-overview-card--used.govuk-button,
-.app-overview-category[data-category-key="photo"] .app-overview-card--used.govuk-button {
-    color: #0b0c0c;
 }
 
 /* ============================================
@@ -208,8 +354,10 @@
     color: var(--govuk-secondary-text-colour, #484949);
 }
 
-.app-history__actions {
-    margin: 0;
+.app-history__value {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
 }
 
 .app-link-button {

@@ -1,10 +1,11 @@
-const CACHE_NAME = 'hider-cheat-sheet-v4';
+const CACHE_NAME = 'hider-cheat-sheet-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './questions-data.js',
   './styles.css',
   './vendor/govuk-frontend/govuk-frontend.min.css',
+  './vendor/material-symbols/material-symbols-subset.woff2',
   './manifest.json',
   './js/app.js'
   // Note: Icons omitted (don't exist yet)

@@ -112,6 +112,41 @@ export function sentenceCase(text) {
 }
 
 /**
+ * Set the category colour and the text colour on it as CSS custom properties
+ * @param {HTMLElement} element - The element (usually a section)
+ * @param {object} categoryData - The category data ({ color, textColor })
+ */
+export function setCategoryColours(element, categoryData) {
+  element.style.setProperty('--app-category-colour', categoryData.color);
+  element.style.setProperty('--app-category-text-colour', categoryData.textColor || '#ffffff');
+}
+
+/**
+ * HTML for a question icon in a square of the category colour
+ * @param {string} iconName - Material Symbols icon name
+ * @returns {string} HTML
+ */
+export function iconBoxHTML(iconName) {
+  return `<span class="app-icon-box" aria-hidden="true"><span class="app-icon">${iconName || 'help'}</span></span>`;
+}
+
+/**
+ * Update the "N of M asked" text in each section of a container
+ * @param {HTMLElement} container - Container with <section> elements
+ * @param {string} itemSelector - Selector for one question in a section
+ * @param {string} usedClass - Class that marks an asked question
+ */
+export function updateProgress(container, itemSelector, usedClass) {
+  container.querySelectorAll('section').forEach(section => {
+    const progress = section.querySelector('.app-band__progress');
+    if (!progress) return;
+    const items = section.querySelectorAll(itemSelector);
+    const used = section.querySelectorAll(`${itemSelector}.${usedClass}`).length;
+    progress.textContent = `${used} of ${items.length} asked`;
+  });
+}
+
+/**
  * Escape HTML to prevent XSS
  * @param {string} text - The text to escape
  * @returns {string} Escaped text

@@ -1,10 +1,11 @@
 import { EventDelegator } from '../../utils/events.js';
-import { sentenceCase } from '../../utils/dom.js';
+import { sentenceCase, setCategoryColours, iconBoxHTML, updateProgress } from '../../utils/dom.js';
 
 /**
- * OverviewRenderer - Renders all questions as a compact grid of buttons
+ * OverviewRenderer - Renders all questions as a compact grid of icon tiles
  *
- * Asked questions show in the category colour with a tick.
+ * Each category starts with a short band in its colour. Asked questions
+ * are grey with a tick.
  * Select an asked question again to mark it as not asked.
  */
 export class OverviewRenderer {
@@ -43,6 +44,7 @@ export class OverviewRenderer {
     for (const [categoryKey, categoryData] of Object.entries(questionsData)) {
       this.#container.appendChild(this.#renderCategory(categoryKey, categoryData));
     }
+    updateProgress(this.#container, '.overview-card', 'app-overview-card--used');
   }
 
   /**
@@ -89,12 +91,17 @@ export class OverviewRenderer {
     const section = document.createElement('section');
     section.className = 'app-overview-category';
     section.dataset.categoryKey = categoryKey;
-    section.style.setProperty('--app-category-colour', categoryData.color);
+    setCategoryColours(section, categoryData);
 
-    const heading = document.createElement('h2');
-    heading.className = 'govuk-heading-m app-category__heading';
-    heading.textContent = sentenceCase(categoryData.title);
-    section.appendChild(heading);
+    section.innerHTML = `
+      <div class="app-band app-band--compact">
+        <div class="app-band__title-row">
+          <span class="app-icon" aria-hidden="true">${categoryData.icon || 'help'}</span>
+          <h2 class="govuk-heading-m app-band__heading">${sentenceCase(categoryData.title)}</h2>
+          <span class="app-band__progress"></span>
+        </div>
+      </div>
+    `;
 
     categoryData.questions.forEach(group => {
       if (group.subcategory) {
@@ -118,7 +125,7 @@ export class OverviewRenderer {
   #createOverviewCard(categoryData, item) {
     const card = document.createElement('button');
     card.type = 'button';
-    card.className = 'govuk-button govuk-button--secondary overview-card';
+    card.className = 'govuk-button govuk-button--secondary overview-card app-overview-card';
 
     card.dataset.category = categoryData.title;
     card.dataset.title = item.title;
@@ -127,7 +134,11 @@ export class OverviewRenderer {
     card.dataset.note = item.note || '';
     card.dataset.reward = categoryData.reward;
 
-    card.innerHTML = `${item.title}<span class="govuk-visually-hidden app-overview-card__status"></span>`;
+    card.innerHTML = `
+      ${iconBoxHTML(item.icon)}
+      <span>${item.title}</span>
+      <span class="govuk-visually-hidden app-overview-card__status"></span>
+    `;
     this.#setCardUsed(card, this.#stateManager.isQuestionUsed(categoryData.title, item.title));
 
     return card;
@@ -142,6 +153,17 @@ export class OverviewRenderer {
     card.setAttribute('aria-pressed', String(isUsed));
     const status = card.querySelector('.app-overview-card__status');
     if (status) status.textContent = isUsed ? ' (asked)' : '';
+
+    let tick = card.querySelector('.app-overview-card__tick');
+    if (isUsed && !tick) {
+      tick = document.createElement('span');
+      tick.className = 'app-icon app-overview-card__tick';
+      tick.setAttribute('aria-hidden', 'true');
+      tick.textContent = 'check';
+      card.appendChild(tick);
+    } else if (!isUsed && tick) {
+      tick.remove();
+    }
   }
 
   #updateCardUsedState(category, title, isUsed) {
@@ -150,6 +172,7 @@ export class OverviewRenderer {
         this.#setCardUsed(card, isUsed);
       }
     });
+    updateProgress(this.#container, '.overview-card', 'app-overview-card--used');
   }
 
   /* ============================================

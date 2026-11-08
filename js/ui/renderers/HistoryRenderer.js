@@ -1,5 +1,5 @@
 import { EventDelegator } from '../../utils/events.js';
-import { sentenceCase } from '../../utils/dom.js';
+import { sentenceCase, setCategoryColours, iconBoxHTML } from '../../utils/dom.js';
 
 /**
  * HistoryRenderer - Renders question history as a GOV.UK summary list
@@ -93,13 +93,22 @@ export class HistoryRenderer {
     const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     const dateStr = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 
+    const questionData = this.#questionService.getQuestion(item.category, item.title);
+    const categoryData = questionData ? this.#questionService.getCategoryData(questionData.categoryKey) : null;
+    if (categoryData) setCategoryColours(row, categoryData);
+
     row.innerHTML = `
       <dt class="govuk-summary-list__key">
         ${timeStr}<br><span class="govuk-body-s govuk-!-font-weight-regular">${dateStr}</span>
       </dt>
       <dd class="govuk-summary-list__value">
-        <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">${sentenceCase(item.category)}: ${item.title}</p>
-        <p class="govuk-body-s govuk-!-margin-bottom-0">${item.question}</p>
+        <div class="app-history__value">
+          ${iconBoxHTML(questionData?.icon)}
+          <div>
+            <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">${sentenceCase(item.category)}: ${item.title}</p>
+            <p class="govuk-body-s govuk-!-margin-bottom-0">${item.question}</p>
+          </div>
+        </div>
       </dd>
       <dd class="govuk-summary-list__actions">
         <button type="button" class="govuk-link app-link-button history-copy-btn">
