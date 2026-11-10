@@ -1,1319 +1,766 @@
 /* ============================================
-   CSS VARIABLES & THEME
+   App styles on top of GOV.UK Frontend 6.6.0
+   Use GOV.UK Frontend classes first. Add rules here only where
+   the app needs a pattern the design system does not have.
    ============================================ */
-:root {
-    --grid-color: rgba(0, 0, 0, 0.03);
-    --station-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+
+.hidden {
+    display: none !important;
+}
+
+/* Leave space at the bottom so the copy banner does not cover content */
+.govuk-template__body {
+    font-family: "Inter", arial, sans-serif;
 }
 
 /* ============================================
-   GLOBAL STYLES
+   FONT (Inter, self-hosted so the app works offline; see vendor/inter)
    ============================================ */
-body {
-    font-family: 'Figtree', sans-serif;
-    background:
-        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
-        linear-gradient(0deg, var(--grid-color) 1px, transparent 1px),
-        #fafafa;
-    background-size: 20px 20px;
-}
-
-.material-symbols-outlined {
-    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url("vendor/inter/inter-latin-variable.woff2") format("woff2");
 }
 
 /* ============================================
-   ANIMATIONS
+   HEADER AND NAVIGATION
+   Mobile first: a slim header with the service name, and the
+   navigation as a tab bar fixed to the bottom of the screen (easy to
+   reach with a thumb). From tablet width: one bar with the service
+   name on the left and the navigation on the right.
    ============================================ */
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes trainArrive {
-    0% {
-        opacity: 0;
-        transform: translate(-50%, 20px) scale(0.95);
-    }
-
-    15% {
-        opacity: 1;
-        transform: translate(-50%, 0) scale(1);
-    }
-
-    85% {
-        opacity: 1;
-        transform: translate(-50%, 0) scale(1);
-    }
-
-    100% {
-        opacity: 0;
-        transform: translate(-50%, -10px) scale(0.98);
-    }
-}
-
-/* ============================================
-   LAYOUT & STRUCTURE
-   ============================================ */
-
-/* Header Styles */
-.header-bar {
-    position: sticky;
-    top: 0;
-    background: white;
-    border-bottom: 1px solid rgba(229, 231, 235, 0.6);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    z-index: 50;
-}
-
-.header-content {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    max-width: 100%;
-}
-
-.header-title {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #374151;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-}
-
-.header-subtitle {
-    font-size: 0.875rem;
-    color: #9ca3af;
-    font-weight: 500;
-    margin-top: 2px;
-}
-
-/* Header Buttons - Ghost Style */
-.search-button,
-.overflow-button {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: transparent;
-    color: #6b7280;
-    border: 1px solid rgba(229, 231, 235, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    flex-shrink: 0;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.search-button:hover,
-.overflow-button:hover {
-    background: #f9fafb;
-    border-color: rgba(209, 213, 219, 0.8);
-    color: #374151;
-}
-
-.search-button:active,
-.overflow-button:active {
-    transform: scale(0.95);
-    background: #f3f4f6;
-}
-
-.search-button .material-symbols-outlined,
-.overflow-button .material-symbols-outlined {
-    font-size: 22px;
-}
-
-/* Search Container */
-.search-container {
-    position: sticky;
-    top: 70px;
-    background: white;
-    border-bottom: 1px solid rgba(229, 231, 235, 0.6);
-    padding: 12px 16px;
-    z-index: 40;
-    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.search-container.hidden {
-    display: none;
-}
-
-.search-bar {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #f9fafb;
-    border: 1px solid rgba(229, 231, 235, 0.6);
-    border-radius: 8px;
-    padding: 8px 12px;
-    transition: all 0.2s;
-}
-
-.search-bar:focus-within {
-    border-color: rgba(156, 163, 175, 0.5);
-    background: white;
-    box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.08);
-}
-
-.search-icon {
-    color: #6b7280;
-    font-size: 20px;
-    flex-shrink: 0;
-}
-
-#search-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 16px;
-    color: #111827;
-    font-weight: 500;
-}
-
-#search-input::placeholder {
-    color: #9ca3af;
-}
-
-.clear-search-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: transparent;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: #6b7280;
-    transition: all 0.2s;
-    flex-shrink: 0;
-}
-
-.clear-search-btn:hover {
-    background: #e5e7eb;
-    color: #111827;
-}
-
-.clear-search-btn:active {
-    transform: scale(0.9);
-}
-
-.clear-search-btn .material-symbols-outlined {
-    font-size: 18px;
-}
-
-.search-results-count {
-    margin-top: 8px;
-    font-size: 14px;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-.search-message {
-    margin-top: 8px;
-    padding: 12px;
-    background: #fef3c7;
-    border-left: 2px solid #f59e0b;
-    border-radius: 4px;
-    font-size: 14px;
-    color: #92400e;
-    font-weight: 500;
-}
-
-.search-message.hidden {
-    display: none;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Overflow Menu */
-.overflow-menu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 150;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-}
-
-.overflow-menu.hidden {
-    display: none;
-}
-
-.overflow-backdrop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: transparent;
-}
-
-.overflow-content {
-    position: relative;
-    margin-top: 70px;
-    margin-right: 16px;
-    background: white;
-    border: 1px solid rgba(229, 231, 235, 0.6);
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-    animation: slideDown 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-    min-width: 200px;
-}
-
-.overflow-item {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-    background: white;
-    border: none;
-    border-bottom: 1px solid rgba(229, 231, 235, 0.5);
-    cursor: pointer;
-    transition: background 0.2s;
-    font-size: 15px;
-    font-weight: 500;
-    color: #374151;
-    text-align: left;
-}
-
-.overflow-item:last-child {
-    border-bottom: none;
-}
-
-.overflow-item:hover {
-    background: #f9fafb;
-}
-
-.overflow-item:active {
-    background: #f3f4f6;
-}
-
-.overflow-item .material-symbols-outlined {
-    font-size: 20px;
-    color: #6b7280;
-}
-
-.overflow-item span:last-child {
-    flex: 1;
-}
-
-/* Main Content Areas */
-.main-content {
-    padding: 16px;
-    padding-bottom: 96px;
-    min-height: calc(100vh - 70px);
-}
-
-.questions-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    max-width: 100%;
-}
-
-@media (min-width: 768px) {
-    .header-content {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 16px 24px;
-    }
-
-    .header-title {
-        font-size: 1.75rem;
-    }
-
-    .main-content {
-        padding: 24px;
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-
-    .questions-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-}
-
-@media (min-width: 1280px) {
-    .questions-container {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
-    }
-}
-
-/* Category Sections */
-section {
-    animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-    scroll-margin-top: 80px;
-}
-
-section:nth-child(1) {
-    animation-delay: 0.05s;
-}
-
-section:nth-child(2) {
-    animation-delay: 0.1s;
-}
-
-section:nth-child(3) {
-    animation-delay: 0.15s;
-}
-
-section:nth-child(4) {
-    animation-delay: 0.2s;
-}
-
-section:nth-child(5) {
-    animation-delay: 0.25s;
-}
-
-section:nth-child(6) {
-    animation-delay: 0.3s;
-}
-
-/* Category headers - mobile optimized */
-section > div:first-child {
-    padding: 14px 16px;
-}
-
-section > div:first-child h2 {
-    font-size: 1.125rem;
-    line-height: 1.3;
-}
-
-section > div:first-child p {
-    font-size: 0.875rem;
-    margin-top: 4px;
-}
-
-section > div:first-child .flex {
-    margin-top: 10px;
-}
-
-section > div:first-child .flex span {
-    font-size: 0.75rem;
-    padding: 4px 10px;
-}
-
-@media (min-width: 768px) {
-    section > div:first-child {
-        padding: 16px 20px;
-    }
-
-    section > div:first-child h2 {
-        font-size: 1.25rem;
-    }
-
-    section > div:first-child .flex span {
-        font-size: 0.8125rem;
-        padding: 5px 12px;
-    }
-}
-
-/* ============================================
-   COMPONENTS
-   ============================================ */
-button {
-    font-family: 'Figtree', sans-serif;
-}
-
-.question-card {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 10px;
-    min-height: 60px;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.question-card:active:not(.card-used) {
-    transform: scale(0.98);
-}
-
-.thermometer-card {
-    -webkit-tap-highlight-color: transparent;
-}
-
-.icon-shape {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.icon-shape .material-symbols-outlined {
-    font-size: 24px;
-}
-
-@media (min-width: 768px) {
-    .icon-shape {
-        width: 40px;
-        height: 40px;
-    }
-
-    .icon-shape .material-symbols-outlined {
-        font-size: 22px;
-    }
-}
-
-/* Toast Notification */
-.toast-notification {
-    position: fixed;
-    bottom: 92px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #111827;
-    color: white;
-    padding: 12px 16px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    z-index: 999;
-    font-family: 'Figtree', sans-serif;
-    font-weight: 600;
-    font-size: 0.875rem;
-    letter-spacing: 0.5px;
-    border-left: 3px solid #10b981;
-    display: none;
-    align-items: center;
-    gap: 12px;
-    white-space: nowrap;
-}
-
-.toast-notification.toast {
-    display: flex;
-    animation: trainArrive 2s ease-in-out;
-}
-
-.toast-notification.toast-with-undo {
-    animation: trainArrive 4s ease-in-out;
-}
-
-.toast-message {
-    display: flex;
-    align-items: center;
-}
-
-.undo-button {
-    padding: 6px 14px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 6px;
-    color: white;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-    flex-shrink: 0;
-}
-
-.undo-button:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.5);
-}
-
-.undo-button:active {
-    transform: scale(0.95);
-}
-
-.undo-button.hidden {
-    display: none;
-}
-
-/* Card "used" state styling */
-.card-used {
-    opacity: 0.35;
-    background-color: #f5f5f5 !important;
-    cursor: default;
-}
-
-.card-used * {
-    color: #9ca3af !important;
-}
-
-.card-used .icon-shape {
-    background-color: #d1d5db !important;
-}
-
-.card-used .thermometer-btn {
-    border-color: #d1d5db !important;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-.card-used .thermometer-btn:hover {
-    background-color: white !important;
-}
-
-/* Content padding improvements */
-section > div:last-child {
-    padding: 14px;
-}
-
-@media (min-width: 768px) {
-    section > div:last-child {
-        padding: 16px;
-    }
-}
-
-/* Thermometer button improvements for mobile */
-.thermometer-btn {
-    min-height: 36px;
-    font-size: 0.75rem;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.thermometer-btn:active:not([disabled]) {
-    transform: scale(0.95);
-}
-
-@media (min-width: 768px) {
-    .thermometer-btn {
-        min-height: 32px;
-    }
-}
-
-/* General Rules section improvements */
-section:last-child {
-    border: 1px solid rgba(229, 231, 235, 0.6);
-}
-
-section:last-child h2 {
-    font-size: 1rem;
-}
-
-section:last-child ul {
-    font-size: 0.875rem;
-}
-
-@media (min-width: 768px) {
-    section:last-child h2 {
-        font-size: 1.125rem;
-    }
-
-    section:last-child ul {
-        font-size: 0.9375rem;
-    }
-}
-
-/* ============================================
-   CATEGORY THEMES
-   ============================================ */
-
-/* MATCHING - Deep Blue (#1C3F94) */
-.matching-header {
-    background-color: #1C3F94;
-}
-
-.matching-card {
-    background-color: white;
-    box-shadow: var(--station-shadow);
-}
-
-.matching-card:hover {
-    background-color: #f8f9ff;
-}
-
-.matching-card .icon-shape {
-    background-color: #1C3F94;
-    color: white;
-}
-
-.icon-shape.matching-card,
-.matching-card .icon-shape {
-    background-color: #1C3F94;
-    color: white;
-}
-
-/* MEASURING - Kelly Green (#009B3A) */
-.measuring-header {
-    background-color: #009B3A;
-}
-
-.measuring-card {
-    background-color: white;
-    box-shadow: var(--station-shadow);
-}
-
-.measuring-card:hover {
-    background-color: #f0fdf4;
-}
-
-.measuring-card .icon-shape {
-    background-color: #009B3A;
-    color: white;
-}
-
-.icon-shape.measuring-card,
-.measuring-card .icon-shape {
-    background-color: #009B3A;
-    color: white;
-}
-
-/* RADAR - Signal Red (#EE352E) */
-.radar-header {
-    background-color: #EE352E;
-}
-
-.radar-card {
-    background-color: white;
-    box-shadow: var(--station-shadow);
-}
-
-.radar-card:hover {
-    background-color: #fef2f2;
-}
-
-.radar-card .icon-shape {
-    background-color: #EE352E;
-    color: white;
-}
-
-.icon-shape.radar-card,
-.radar-card .icon-shape {
-    background-color: #EE352E;
-    color: white;
-}
-
-/* THERMOMETER - Yellow (#FCCC0A) */
-.thermometer-header {
-    background-color: #FCCC0A;
-}
-
-.thermometer-card {
-    background-color: white;
-    box-shadow: var(--station-shadow);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.thermometer-card:hover {
-    background-color: #fffbeb;
-}
-
-.thermometer-card .icon-shape {
-    background-color: #FCCC0A;
-    color: #000;
-}
-
-.icon-shape.thermometer-card,
-.thermometer-card .icon-shape {
-    background-color: #FCCC0A;
-    color: #000;
-}
-
-/* TENTACLE - Purple (#6D28D9) */
-.tentacle-header {
-    background-color: #6D28D9;
-}
-
-.tentacle-card {
-    background-color: white;
-    box-shadow: var(--station-shadow);
-}
-
-.tentacle-card:hover {
-    background-color: #faf5ff;
-}
-
-.tentacle-card .icon-shape {
-    background-color: #6D28D9;
-    color: white;
-}
-
-.icon-shape.tentacle-card,
-.tentacle-card .icon-shape {
-    background-color: #6D28D9;
-    color: white;
-}
-
-/* PHOTO - Sky Blue (#00A9E0) */
-.photo-header {
-    background-color: #00A9E0;
-}
-
-.photo-card {
-    background-color: white;
-    box-shadow: var(--station-shadow);
-}
-
-.photo-card:hover {
-    background-color: #f0f9ff;
-}
-
-.photo-card .icon-shape {
-    background-color: #00A9E0;
-    color: white;
-}
-
-.icon-shape.photo-card,
-.photo-card .icon-shape {
-    background-color: #00A9E0;
-    color: white;
-}
-
-/* ============================================
-   QUICK JUMP NAVIGATION
-   ============================================ */
-.quick-jump {
-    position: fixed;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 45;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 8px;
-    background: white;
-    border: 1px solid rgba(229, 231, 235, 0.6);
-    border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    animation: fadeIn 0.3s ease-out;
-}
-
-.quick-jump.hidden {
-    display: none;
-}
-
-.quick-jump-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid transparent;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.quick-jump-dot:hover {
-    transform: scale(1.4);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.quick-jump-dot:active {
-    transform: scale(1.2);
-}
-
-.quick-jump-dot.active {
-    transform: scale(1.3);
-    border-color: rgba(107, 114, 128, 0.5);
-    box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.1);
-}
-
-/* Category-specific dot colors */
-.quick-jump-dot[data-category="matching"] {
-    background: #1C3F94;
-}
-
-.quick-jump-dot[data-category="measuring"] {
-    background: #009B3A;
-}
-
-.quick-jump-dot[data-category="radar"] {
-    background: #EE352E;
-}
-
-.quick-jump-dot[data-category="thermometer"] {
-    background: #FCCC0A;
-}
-
-.quick-jump-dot[data-category="photo"] {
-    background: #00A9E0;
-}
-
-.quick-jump-dot[data-category="tentacle"] {
-    background: #6D28D9;
-}
-
-@media (max-width: 640px) {
-    .quick-jump {
-        right: 12px;
-        gap: 8px;
-        padding: 6px;
-    }
-
-    .quick-jump-dot {
-        width: 10px;
-        height: 10px;
-    }
-}
-
-/* ============================================
-   VIEW MODES
-   ============================================ */
-
-/* Overview View */
-.overview-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.overview-subcategory {
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-top: 16px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-}
-
-.overview-subcategory:first-child {
-    margin-top: 0;
-}
-
-.overview-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
-@media (min-width: 640px) {
-    .overview-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-@media (min-width: 768px) {
-    .overview-grid {
-        grid-template-columns: repeat(5, 1fr);
-    }
-}
-
-.overview-card {
-    background: white;
-    border: 1px solid rgba(229, 231, 235, 0.6);
-    border-radius: 8px;
-    padding: 12px 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--station-shadow);
-}
-
-.overview-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    border-color: rgba(156, 163, 175, 0.5);
-}
-
-.overview-card:active {
-    transform: translateY(0);
-}
-
-.overview-card-icon-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.overview-card .icon-shape {
-    width: 36px;
-    height: 36px;
-}
-
-.overview-card .icon-shape .material-symbols-outlined {
-    font-size: 20px;
-}
-
-.overview-card-title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #374151;
-    text-align: center;
-    line-height: 1.3;
-    word-break: break-word;
-    hyphens: auto;
-}
-
-.overview-checkmark {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    font-size: 18px;
-    color: #10b981;
-    background: white;
-    border-radius: 50%;
-    font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 20;
-}
-
-.overview-card-used {
-    opacity: 0.4;
-}
-
-.overview-card-used:hover {
-    opacity: 0.6;
-}
-
-.overview-card-used .overview-card-title {
-    color: #9ca3af;
-}
-
-/* History View */
-.history-container {
-    background: white;
-    border: 1px solid rgba(229, 231, 235, 0.6);
-    border-radius: 12px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-}
-
-.history-header {
-    background: #f9fafb;
-    border-bottom: 1px solid rgba(229, 231, 235, 0.6);
-    padding: 16px;
-    display: flex;
-    align-items: center;
-}
-
-.history-header h2 {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #374151;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
-}
-
-.history-list {
-    padding: 16px;
-}
-
-.history-list:empty::before {
-    content: 'No questions asked yet';
-    display: block;
-    text-align: center;
-    color: #9ca3af;
-    padding: 32px 16px;
-    font-size: 0.875rem;
-}
-
-.history-item {
-    border-bottom: 1px solid rgba(229, 231, 235, 0.5);
-    padding: 12px 0;
-    transition: background 0.2s;
-}
-
-.history-item:last-child {
-    border-bottom: none;
-}
-
-.history-item:hover {
-    background: #f9fafb;
-    margin: 0 -16px;
-    padding: 12px 16px;
-}
-
-.history-copy-btn {
-    padding: 6px 12px;
-    background: #f3f4f6;
-    color: #6b7280;
-    border: 1px solid rgba(209, 213, 219, 0.6);
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    transition: all 0.2s;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.history-copy-btn:hover {
-    background: #e5e7eb;
-    border-color: rgba(156, 163, 175, 0.7);
-    color: #374151;
-}
-
-.history-copy-btn:active {
-    transform: scale(0.95);
-    background: #d1d5db;
-}
-
-.history-copy-btn .material-symbols-outlined {
-    font-size: 14px;
-}
-
-/* ============================================
-   SETTINGS MODAL
-   ============================================ */
-.settings-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 200;
-    display: flex;
-    align-items: flex-end;
-}
-
-.settings-modal.hidden {
-    display: none;
-}
-
-.settings-backdrop {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(2px);
-    animation: fadeIn 0.2s ease-out;
-}
-
-.settings-content {
-    position: relative;
-    width: 100%;
-    max-height: 80vh;
-    background: white;
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+.app-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #cecece;
+    font-family: "Inter", arial, sans-serif;
 }
 
-.settings-header {
+.app-header__inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px;
-    border-bottom: 1px solid rgba(229, 231, 235, 0.6);
-    background: white;
 }
 
-.settings-title {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: #374151;
-    letter-spacing: -0.02em;
-    display: flex;
+.app-header__brand {
+    display: inline-flex;
     align-items: center;
-}
-
-.settings-close-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #f3f4f6;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    flex-shrink: 0;
-}
-
-.settings-close-btn:hover {
-    background: #e5e7eb;
-}
-
-.settings-close-btn:active {
-    transform: scale(0.9);
-}
-
-.settings-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px 20px;
-}
-
-.settings-section-title {
-    font-size: 0.875rem;
+    gap: 10px;
+    padding: 12px 0;
+    color: #0b0c0c;
+    font-size: 1.125rem;
     font-weight: 700;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+    text-decoration: none;
 }
 
-.settings-options {
+.app-header__brand:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+}
+
+.app-header__brand:focus-visible {
+    outline: 3px solid transparent;
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    text-decoration: none;
+}
+
+/* Small mark made of the 6 category colours */
+.app-header__mark {
+    display: grid;
+    grid-template-columns: repeat(3, 8px);
+    grid-template-rows: repeat(2, 8px);
+    gap: 2px;
+}
+
+.app-header__mark span:nth-child(1) { background-color: #232F41; }
+.app-header__mark span:nth-child(2) { background-color: #4DA266; }
+.app-header__mark span:nth-child(3) { background-color: #F6793C; }
+.app-header__mark span:nth-child(4) { background-color: #FFBF40; }
+.app-header__mark span:nth-child(5) { background-color: #81B5CD; }
+.app-header__mark span:nth-child(6) { background-color: #9372AE; }
+
+/* Bottom tab bar (phones) */
+.app-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    background-color: #ffffff;
+    border-top: 1px solid #cecece;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.app-nav__list {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.app-nav__item {
+    flex: 1 1 0;
+}
+
+.app-nav__link {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-}
-
-.settings-option {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 16px;
-    background: #f9fafb;
-    border: 1px solid rgba(229, 231, 235, 0.6);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.settings-option:has(input:checked) {
-    background: #f0f9ff;
-    border-color: rgba(107, 114, 128, 0.6);
-}
-
-.settings-option input[type="radio"] {
-    width: 20px;
-    height: 20px;
-    margin-top: 2px;
-    cursor: pointer;
-    accent-color: #6b7280;
-    flex-shrink: 0;
-}
-
-.settings-option-content {
-    flex: 1;
-}
-
-.settings-option-label {
-    font-size: 16px;
+    align-items: center;
+    gap: 2px;
+    min-height: 56px;
+    box-sizing: border-box;
+    padding: 6px 2px 6px;
+    border-top: 3px solid transparent;
+    color: var(--govuk-secondary-text-colour, #484949);
+    font-size: 0.75rem;
     font-weight: 600;
-    color: #374151;
-    margin-bottom: 4px;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.settings-option-description {
-    font-size: 14px;
-    color: #6b7280;
-    line-height: 1.5;
+.app-nav__item--active .app-nav__link {
+    color: var(--govuk-brand-colour, #1d70b8);
+    border-top-color: var(--govuk-brand-colour, #1d70b8);
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+.app-nav__link:focus-visible {
+    outline: 3px solid transparent;
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    box-shadow: inset 0 -4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
-@keyframes slideUp {
-    from {
-        transform: translateY(100%);
-    }
-    to {
-        transform: translateY(0);
-    }
+/* Room for the tab bar at the bottom of the page */
+.govuk-template__body {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
 }
 
-@media (min-width: 768px) {
-    .settings-modal {
-        align-items: center;
-        justify-content: center;
+/* Top navigation (tablet and desktop) */
+@media (min-width: 40.0625em) {
+    .govuk-template__body {
+        padding-bottom: 0;
     }
 
-    .settings-content {
-        max-width: 500px;
-        max-height: 600px;
-        border-radius: 12px;
-        margin: 0 auto;
+    .app-header__brand {
+        padding: 0;
+        font-size: 1.1875rem;
     }
 
-    .settings-header {
-        border-radius: 12px 12px 0 0;
+    .app-nav {
+        position: static;
+        align-self: stretch;
+        border-top: 0;
+        padding-bottom: 0;
+        background: none;
+    }
+
+    .app-nav__list {
+        height: 100%;
+        gap: 25px;
+    }
+
+    .app-nav__item {
+        flex: 0 0 auto;
+    }
+
+    .app-nav .app-nav__icon {
+        display: none;
+    }
+
+    .app-nav__link {
+        display: block;
+        height: 100%;
+        min-height: 0;
+        padding: 20px 0 16px;
+        border-top: 0;
+        border-bottom: 4px solid transparent;
+        color: var(--govuk-link-colour, #1a65a6);
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    .app-nav__link:hover {
+        color: var(--govuk-link-hover-colour, #0f385c);
+        border-bottom-color: #cecece;
+    }
+
+    .app-nav__item--active .app-nav__link {
+        color: #0b0c0c;
+        font-weight: 700;
+        border-bottom-color: var(--govuk-brand-colour, #1d70b8);
     }
 }
 
 /* ============================================
-   BOTTOM NAVIGATION BAR
+   PAGE HEADINGS (smaller on phones, so content starts higher)
    ============================================ */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    border-top: 1px solid rgba(229, 231, 235, 0.6);
-    display: flex;
-    justify-content: space-around;
-    align-items: stretch;
-    padding: 8px 0 max(8px, env(safe-area-inset-bottom));
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
-    z-index: 100;
+.app-view__heading {
+    margin-bottom: 10px;
 }
 
-.bottom-nav-item {
+.app-view__intro {
+    margin-bottom: 15px;
+}
+
+@media (max-width: 40.0525em) {
+    .govuk-main-wrapper {
+        padding-top: 15px;
+    }
+
+    .app-view__heading {
+        font-size: 1.625rem;
+    }
+}
+
+/* Remove the 300 ms tap delay on phones */
+a, button, input, label {
+    touch-action: manipulation;
+}
+
+/* ============================================
+   SEARCH
+   ============================================ */
+.app-search__row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.app-search__row .govuk-input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.app-search__clear.govuk-button {
+    width: auto;
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   CATEGORY JUMP ROW (Questions view)
+   Sticks to the top of the screen. On phones it scrolls sideways.
+   ============================================ */
+.app-jump {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    margin: 0 -15px 20px;
+    padding: 8px 15px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #cecece;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.app-jump::-webkit-scrollbar {
+    display: none;
+}
+
+.app-jump__list {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.app-jump__item {
+    flex-shrink: 0;
+}
+
+.app-jump__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    box-sizing: border-box;
+    padding: 6px 12px;
+    border: 1px solid #b1b4b6;
+    background-color: #ffffff;
+    color: #0b0c0c;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.app-jump__link:hover {
+    border-color: #0b0c0c;
+}
+
+.app-jump__link:focus-visible {
+    outline: 3px solid transparent;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    box-shadow: inset 0 -4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.app-jump__swatch {
+    width: 12px;
+    height: 12px;
+    background-color: var(--app-category-colour, #0b0c0c);
+}
+
+@media (min-width: 40.0625em) {
+    .app-jump {
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+/* ============================================
+   ICONS (Material Symbols subset, see vendor/material-symbols)
+   ============================================ */
+@font-face {
+    font-family: "Material Symbols Outlined";
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url("vendor/material-symbols/material-symbols-subset.woff2") format("woff2");
+}
+
+.app-icon {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    direction: ltr;
+    font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Square in the category colour that holds a question icon */
+.app-icon-box {
+    position: relative;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--app-category-colour, #0b0c0c);
+    color: var(--app-category-text-colour, #ffffff);
+}
+
+/* ============================================
+   CATEGORY BANDS
+   Full-width band in the category colour. The colours match the
+   physical cards in the game. --app-category-text-colour gives
+   4.5:1 contrast or more on each colour.
+   ============================================ */
+.app-category {
+    margin-bottom: 40px;
+    scroll-margin-top: 64px; /* below the sticky jump row */
+}
+
+.app-band {
+    margin: 0 -15px 20px;
+    padding: 20px 15px;
+    background-color: var(--app-category-colour, #0b0c0c);
+    color: var(--app-category-text-colour, #ffffff);
+}
+
+@media (min-width: 40.0625em) {
+    .app-band {
+        margin-left: 0;
+        margin-right: 0;
+        padding: 20px;
+    }
+}
+
+.app-band--compact {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 15px;
+}
+
+.app-band__title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.app-band__title-row .app-icon {
+    font-size: 32px;
+}
+
+.app-band__heading {
+    margin: 0;
+    color: inherit;
+}
+
+.app-band__progress {
+    margin-left: auto;
+    font-family: "Inter", arial, sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    white-space: nowrap;
+}
+
+.app-band__description {
+    margin: 10px 0 12px;
+    color: inherit;
+}
+
+.app-band__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.app-band__tags .govuk-tag {
+    background-color: #ffffff;
+    color: #0b0c0c;
+}
+
+@media (max-width: 40.0525em) {
+    .app-band {
+        padding: 15px;
+    }
+
+    .app-band__heading.govuk-heading-l {
+        font-size: 1.5rem;
+    }
+
+    .app-band__title-row .app-icon {
+        font-size: 28px;
+    }
+
+    .app-band__description.govuk-body-l {
+        font-size: 1rem;
+        margin: 8px 0 10px;
+    }
+
+    .app-band__tags .govuk-tag {
+        font-size: 0.8125rem;
+    }
+
+    .app-category .govuk-inset-text {
+        font-size: 0.9375rem;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .app-category h3.govuk-heading-m {
+        font-size: 1.125rem;
+        margin-top: 20px;
+        margin-bottom: 5px;
+    }
+}
+
+/* ============================================
+   QUESTION ROWS (task list with icon and button)
+   ============================================ */
+.app-question.govuk-task-list__item {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.app-question .govuk-task-list__status {
+    margin-left: auto;
+}
+
+.app-question .govuk-task-list__name-and-hint {
     flex: 1;
+    min-width: 0;
+    padding-top: 8px;
+}
+
+.app-question__button {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    color: var(--govuk-link-colour, #1a65a6);
+    text-decoration: underline;
+    text-decoration-thickness: max(1px, .0625rem);
+    text-underline-offset: .1578em;
+}
+
+.app-question__button:hover {
+    color: var(--govuk-link-hover-colour, #0f385c);
+    text-decoration-thickness: max(3px, .1875rem, .12em);
+}
+
+.app-question__button:focus-visible {
+    outline: 3px solid transparent;
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    text-decoration: none;
+}
+
+/* Full question text, in small type under the title */
+.app-question__text {
+    margin: 4px 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.35;
+    color: #0b0c0c;
+}
+
+/* Note (rules for the question): smaller and grey */
+.app-question .app-question__note {
+    margin: 4px 0 0;
+    font-size: 0.875rem;
+    line-height: 1.35;
+}
+
+/* Links inside a hint sit above the full-row click area */
+.app-question .govuk-task-list__hint a {
+    position: relative;
+    z-index: 1;
+}
+
+.app-question .govuk-task-list__status {
+    padding-top: 8px;
+}
+
+/* Asked questions are grey and less prominent, but still selectable */
+.app-question--used .app-icon-box {
+    background-color: #eeefef;
+    color: #6f7071;
+}
+
+.app-question--used .app-question__button,
+.app-question--used .app-thermometer__title {
+    color: var(--govuk-secondary-text-colour, #484949);
+}
+
+.app-question--used .app-question__button {
+    text-decoration-color: #b1b4b6;
+}
+
+.app-question--used .govuk-task-list__hint,
+.app-question--used .app-question__text {
+    color: #6f7071;
+}
+
+/* Phones: tighter rows, slightly smaller title */
+@media (max-width: 40.0525em) {
+    .app-question.govuk-task-list__item {
+        gap: 12px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .app-question__button,
+    .app-thermometer__title.govuk-body {
+        font-size: 1.0625rem;
+        font-weight: 600;
+    }
+
+    .app-question .govuk-task-list__name-and-hint,
+    .app-question .govuk-task-list__status {
+        padding-top: 2px;
+    }
+
+    .app-question .govuk-tag {
+        font-size: 0.8125rem;
+    }
+}
+
+/* Thermometer rows: title, then Start and End buttons */
+.app-thermometer__actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.app-thermometer__actions .govuk-button {
+    margin-bottom: 0;
+    min-width: 90px;
+}
+
+/* ============================================
+   OVERVIEW (grid of icon tiles)
+   ============================================ */
+.app-overview-category {
+    margin-bottom: 30px;
+}
+
+.app-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+@media (min-width: 40.0625em) {
+    .app-overview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+}
+
+.app-overview-card.govuk-button {
+    position: relative;
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 10px 6px 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 4px;
-    padding: 8px 12px;
-    border: none;
+    gap: 8px;
+    font-size: 0.875rem;
+    line-height: 1.2;
+}
+
+.app-overview-card .app-icon-box {
+    width: 40px;
+    height: 40px;
+}
+
+.app-overview-card--used.govuk-button {
+    background-color: #ffffff;
+    color: var(--govuk-secondary-text-colour, #484949);
+    box-shadow: 0 2px 0 #cecece;
+}
+
+.app-overview-card--used .app-icon-box {
+    background-color: #eeefef;
+    color: #6f7071;
+}
+
+.app-overview-card__tick {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 18px;
+    color: #6f7071;
+}
+
+.app-overview-card--used.govuk-button:focus-visible:not(:active):not(:hover) {
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+/* ============================================
+   HISTORY
+   ============================================ */
+.history-list:empty::before {
+    content: "You have not copied any questions yet.";
+    display: block;
+    margin-bottom: 30px;
+    font-size: 1.1875rem;
+    line-height: 1.3158;
+    color: var(--govuk-secondary-text-colour, #484949);
+}
+
+.app-history__value {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.app-link-button {
+    margin: 0;
+    padding: 0;
+    border: 0;
     background: none;
-    color: #6b7280;
+    font: inherit;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    font-family: 'Figtree', sans-serif;
-    min-height: 64px;
-    -webkit-tap-highlight-color: transparent;
 }
 
-.bottom-nav-item .material-symbols-outlined {
-    font-size: 24px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+/* ============================================
+   COPY BANNER (notification banner fixed to the bottom)
+   ============================================ */
+.app-toast {
+    position: fixed;
+    left: 15px;
+    right: 15px;
+    bottom: calc(72px + env(safe-area-inset-bottom)); /* above the tab bar */
+    max-width: 640px;
+    margin: 0 auto;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(11, 12, 12, 0.3);
 }
 
-.bottom-nav-label {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.025em;
+.app-toast__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px;
 }
 
-.bottom-nav-item:active {
-    transform: scale(0.95);
+.app-toast__text.govuk-notification-banner__heading {
+    margin: 0;
+    padding: 0;
+    font-size: 1.1875rem;
+    max-width: none;
 }
 
-.bottom-nav-item.active {
-    color: #374151;
+.app-toast__undo.govuk-button {
+    width: auto;
+    margin-bottom: 0;
+    flex-shrink: 0;
 }
 
-.bottom-nav-item.active .material-symbols-outlined {
-    font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+@media (min-width: 40.0625em) {
+    .app-toast {
+        bottom: calc(15px + env(safe-area-inset-bottom));
+    }
+}
+
+@media (max-width: 40.0525em) {
+    .app-toast__content {
+        padding: 10px 12px;
+    }
+
+    .app-toast__text.govuk-notification-banner__heading {
+        font-size: 1rem;
+    }
+}
+
+/* Space so the copy banner cannot cover the last item on the page */
+.govuk-main-wrapper {
+    padding-bottom: 100px;
+}
+
+/* ============================================
+   TOUCH: show the yellow focus style for keyboard use only.
+   After a tap, buttons go back to their normal look.
+   ============================================ */
+.govuk-button:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.govuk-button--secondary:focus:not(:focus-visible):not(:active) {
+    background-color: #f3f3f3;
+    box-shadow: 0 2px 0 #858686;
+    color: #0b0c0c;
+}
+
+.govuk-button--warning:focus:not(:focus-visible):not(:active) {
+    background-color: #ca3535;
+    box-shadow: 0 2px 0 #651b1b;
+    color: #ffffff;
+}
+
+.app-overview-card--used.govuk-button:focus:not(:focus-visible):not(:active) {
+    background-color: #ffffff;
+    box-shadow: 0 2px 0 #cecece;
+    color: var(--govuk-secondary-text-colour, #484949);
+}
+
+@media (max-width: 40.0525em) {
+    .app-search .govuk-label {
+        font-size: 1rem;
+    }
 }

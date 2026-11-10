@@ -1,15 +1,11 @@
 import { EventDelegator } from '../../utils/events.js';
+import { sentenceCase, setCategoryColours, iconBoxHTML } from '../../utils/dom.js';
 
 /**
- * HistoryRenderer - Renders question history list
+ * HistoryRenderer - Renders question history as a GOV.UK summary list
  *
- * Shows chronological list of asked questions with:
- * - Most recent first
- * - Copy button for each
- * - Timestamps
- * - Category icons
- *
- * PERFORMANCE: Uses QuestionService O(1) lookups instead of O(n²) nested loops
+ * Each row: time and date (key), category, title and question (value),
+ * and a "Copy" action. Most recent first.
  */
 export class HistoryRenderer {
   #container;
@@ -19,7 +15,6 @@ export class HistoryRenderer {
   #events;
 
   /**
-   * Create a new HistoryRenderer
    * @param {HTMLElement} container - The container element
    * @param {QuestionService} questionService - The question service
    * @param {CopyService} copyService - The copy service
@@ -40,25 +35,20 @@ export class HistoryRenderer {
      PUBLIC API
      ============================================ */
 
-  /**
-   * Render history list
-   */
   render() {
     this.#container.innerHTML = '';
 
     const history = this.#stateManager.getHistory();
-
     if (history.length === 0) {
-      return; // CSS ::before will show empty message
+      return; // CSS :empty shows the empty message
     }
 
-    // Show most recent first
-    const reversedHistory = [...history].reverse();
-
-    reversedHistory.forEach((item) => {
-      const historyItem = this.#createHistoryItem(item);
-      this.#container.appendChild(historyItem);
+    const list = document.createElement('dl');
+    list.className = 'govuk-summary-list';
+    [...history].reverse().forEach(item => {
+      list.appendChild(this.#createHistoryItem(item));
     });
+    this.#container.appendChild(list);
   }
 
   /* ============================================
@@ -67,18 +57,11 @@ export class HistoryRenderer {
 
   #setupEventDelegation() {
     this.#events.on('.history-copy-btn', 'click', (event, btn) => {
-      const historyItem = btn.closest('.history-item');
-      const category = historyItem.dataset.category;
-      const title = historyItem.dataset.title;
-      const question = historyItem.dataset.question;
-
-      const historyEntry = { category, title, question };
-
-      // Get full question data from QuestionService (O(1) lookup!)
+      const { category, title, question } = btn.closest('.history-item').dataset;
       const questionData = this.#questionService.getQuestion(category, title);
 
       if (questionData) {
-        this.#copyService.copyFromHistory(historyEntry, questionData);
+        this.#copyService.copyFromHistory({ category, title, question }, questionData);
       } else {
         console.error(`HistoryRenderer: Question not found: ${category}:${title}`);
       }
@@ -90,70 +73,50 @@ export class HistoryRenderer {
      ============================================ */
 
   #observeState() {
-    // Re-render when history changes
-    this.#stateManager.subscribe('historyAdded', () => {
-      this.render();
-    });
-
-    this.#stateManager.subscribe('historyCleared', () => {
-      this.render();
-    });
-
-    this.#stateManager.subscribe('stateReset', () => {
-      this.render();
-    });
+    this.#stateManager.subscribe('historyAdded', () => this.render());
+    this.#stateManager.subscribe('historyCleared', () => this.render());
+    this.#stateManager.subscribe('stateReset', () => this.render());
   }
 
   /* ============================================
      PRIVATE - RENDERING
      ============================================ */
 
-  /**
-   * Create a history item element
-   * @private
-   * @param {object} item - History entry { category, title, question, timestamp }
-   * @returns {HTMLElement} The history item element
-   */
   #createHistoryItem(item) {
-    const historyItem = document.createElement('div');
-    historyItem.className = 'history-item';
+    const row = document.createElement('div');
+    row.className = 'govuk-summary-list__row history-item';
+    row.dataset.category = item.category;
+    row.dataset.title = item.title;
+    row.dataset.question = item.question;
 
-    // Store data attributes for copy handler
-    historyItem.dataset.category = item.category;
-    historyItem.dataset.title = item.title;
-    historyItem.dataset.question = item.question;
-
-    // Format timestamp
     const date = new Date(item.timestamp);
     const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     const dateStr = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 
-    // Get icon and category key from QuestionService (O(1) instead of O(n²)!)
     const questionData = this.#questionService.getQuestion(item.category, item.title);
-    const iconName = questionData?.icon || 'help';
-    const categoryKey = questionData?.categoryKey || '';
+    const categoryData = questionData ? this.#questionService.getCategoryData(questionData.categoryKey) : null;
+    if (categoryData) setCategoryColours(row, categoryData);
 
-    historyItem.innerHTML = `
-      <div class="flex items-start gap-3">
-        <div class="icon-shape ${categoryKey}-card flex-shrink-0">
-          <span class="material-symbols-outlined text-2xl">${iconName}</span>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="font-semibold text-gray-900">${item.category}: ${item.title}</p>
-          <p class="text-sm text-gray-600 mt-1">${item.question}</p>
-          <div class="flex items-center gap-2 mt-2">
-            <button class="history-copy-btn">
-              <span class="material-symbols-outlined">content_copy</span>
-              <span>Copy</span>
-            </button>
-            <div class="text-xs text-gray-500">
-              ${timeStr} • ${dateStr}
-            </div>
+    row.innerHTML = `
+      <dt class="govuk-summary-list__key">
+        ${timeStr}<br><span class="govuk-body-s govuk-!-font-weight-regular">${dateStr}</span>
+      </dt>
+      <dd class="govuk-summary-list__value">
+        <div class="app-history__value">
+          ${iconBoxHTML(questionData?.icon)}
+          <div>
+            <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">${sentenceCase(item.category)}: ${item.title}</p>
+            <p class="govuk-body-s govuk-!-margin-bottom-0">${item.question}</p>
           </div>
         </div>
-      </div>
+      </dd>
+      <dd class="govuk-summary-list__actions">
+        <button type="button" class="govuk-link app-link-button history-copy-btn">
+          Copy<span class="govuk-visually-hidden"> ${item.title} question</span>
+        </button>
+      </dd>
     `;
 
-    return historyItem;
+    return row;
   }
 }

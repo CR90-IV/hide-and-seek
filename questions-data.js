@@ -2,6 +2,8 @@
 export const questionsData = {
     matching: {
         color: '#232F41',
+        textColor: '#ffffff', // Text and icon colour on the category colour (contrast 4.5:1 or more)
+        icon: 'join',
         title: 'MATCHING',
         description: '"Is your nearest ___ the same as my ___?"',
         badges: ['YES / NO', '5 min', 'Draw 3, keep 1'],
@@ -173,6 +175,8 @@ export const questionsData = {
     },
     measuring: {
         color: '#4DA266',
+        textColor: '#0b0c0c', // Text and icon colour on the category colour (contrast 4.5:1 or more)
+        icon: 'straighten',
         title: 'MEASURING',
         description: '"Compared to me, are you closer to or further from ___?"',
         badges: ['CLOSER / FURTHER', '5 min', 'Draw 3, keep 1'],
@@ -328,6 +332,8 @@ export const questionsData = {
     },
     radar: {
         color: '#F6793C',
+        textColor: '#0b0c0c', // Text and icon colour on the category colour (contrast 4.5:1 or more)
+        icon: 'radar',
         title: 'RADAR',
         description: '"Are you within ___ of me?"',
         badges: ['YES / NO', '5 min', 'Draw 2, keep 1'],
@@ -392,6 +398,8 @@ export const questionsData = {
     },
     thermometer: {
         color: '#FFBF40',
+        textColor: '#0b0c0c', // Text and icon colour on the category colour (contrast 4.5:1 or more)
+        icon: 'thermostat',
         title: 'THERMOMETER',
         description: '"After traveling ___, am I hotter or colder?"',
         badges: ['HOTTER / COLDER', '5 min', 'Draw 2, keep 1'],
@@ -425,6 +433,8 @@ export const questionsData = {
     },
     photo: {
         color: '#81B5CD',
+        textColor: '#0b0c0c', // Text and icon colour on the category colour (contrast 4.5:1 or more)
+        icon: 'photo_camera',
         title: 'PHOTO',
         description: '"Send a photo of ___"',
         badges: ['Photo / Cannot answer', '10 min', 'Draw 1, keep 1'],
@@ -556,6 +566,8 @@ export const questionsData = {
     },
     tentacle: {
         color: '#9372AE',
+        textColor: '#0b0c0c', // Text and icon colour on the category colour (contrast 4.5:1 or more)
+        icon: 'hub',
         title: 'TENTACLE',
         description: '"Within ___ of me, which ___ are you nearest to?"',
         badges: ['Name / Not within reach', '5 min', 'Draw 4, keep 2'],

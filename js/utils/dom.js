@@ -100,20 +100,50 @@ export function appendChildren(parent, children) {
 }
 
 /**
- * Get category text color class for headers
- * @param {string} categoryKey - The category key (e.g., 'matching')
- * @returns {string} Tailwind color class
+ * Convert an all-capitals label to sentence case (GOV.UK style)
+ * Labels with lower-case letters do not change.
+ * @param {string} text - The text (e.g. 'MATCHING', 'YES / NO')
+ * @returns {string} Sentence case text (e.g. 'Matching', 'Yes / no')
  */
-export function getCategoryTextColor(categoryKey) {
-  const colorMap = {
-    'matching': 'text-gray-200',
-    'measuring': 'text-green-100',
-    'radar': 'text-orange-100',
-    'thermometer': 'text-yellow-100',
-    'photo': 'text-blue-100',
-    'tentacle': 'text-white'
-  };
-  return colorMap[categoryKey] || 'text-gray-100';
+export function sentenceCase(text) {
+  if (!text || text !== text.toUpperCase()) return text;
+  const lower = text.toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+}
+
+/**
+ * Set the category colour and the text colour on it as CSS custom properties
+ * @param {HTMLElement} element - The element (usually a section)
+ * @param {object} categoryData - The category data ({ color, textColor })
+ */
+export function setCategoryColours(element, categoryData) {
+  element.style.setProperty('--app-category-colour', categoryData.color);
+  element.style.setProperty('--app-category-text-colour', categoryData.textColor || '#ffffff');
+}
+
+/**
+ * HTML for a question icon in a square of the category colour
+ * @param {string} iconName - Material Symbols icon name
+ * @returns {string} HTML
+ */
+export function iconBoxHTML(iconName) {
+  return `<span class="app-icon-box" aria-hidden="true"><span class="app-icon">${iconName || 'help'}</span></span>`;
+}
+
+/**
+ * Update the "N of M asked" text in each section of a container
+ * @param {HTMLElement} container - Container with <section> elements
+ * @param {string} itemSelector - Selector for one question in a section
+ * @param {string} usedClass - Class that marks an asked question
+ */
+export function updateProgress(container, itemSelector, usedClass) {
+  container.querySelectorAll('section').forEach(section => {
+    const progress = section.querySelector('.app-band__progress');
+    if (!progress) return;
+    const items = section.querySelectorAll(itemSelector);
+    const used = section.querySelectorAll(`${itemSelector}.${usedClass}`).length;
+    progress.textContent = `${used} of ${items.length} asked`;
+  });
 }
 
 /**
@@ -125,17 +155,4 @@ export function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
-}
-
-/**
- * Create a Material Symbol icon span
- * @param {string} iconName - The icon name
- * @param {string[]} classes - Additional classes
- * @returns {HTMLElement} The icon element
- */
-export function createIcon(iconName, classes = []) {
-  return createElement('span', {
-    classes: ['material-symbols-outlined', ...classes],
-    text: iconName
-  });
 }

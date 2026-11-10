@@ -27,7 +27,6 @@ import { SearchService } from './services/SearchService.js';
 
 // UI Components
 import { Toast } from './ui/components/Toast.js';
-import { Modal } from './ui/components/Modal.js';
 import { QuickJump } from './ui/components/QuickJump.js';
 
 // Renderers
@@ -51,8 +50,6 @@ class HiderApp {
 
   // UI Components
   toast;
-  settingsModal;
-  overflowMenu;
   quickJump;
 
   // Renderers
@@ -105,13 +102,7 @@ class HiderApp {
    * @private
    */
   #initializeComponents() {
-    this.settingsModal = new Modal('settings-modal');
-    this.overflowMenu = new Modal('overflow-menu');
-    this.quickJump = new QuickJump(
-      'quick-jump',
-      questionsData,
-      '#questions-grid'
-    );
+    this.quickJump = new QuickJump('quick-jump', questionsData);
   }
 
   /**
@@ -208,6 +199,10 @@ class HiderApp {
       });
     }
 
+    // Settings and History buttons
+    document.getElementById('reset-all')?.addEventListener('click', () => this.#resetAll());
+    document.getElementById('clear-history')?.addEventListener('click', () => this.#clearHistory());
+
     // Update search results count
     this.searchService.onSearchResults(({ matches, total, query }) => {
       this.#updateSearchCount(matches.size, total, query);
@@ -215,19 +210,13 @@ class HiderApp {
   }
 
   /**
-   * Phase 7: Expose global API for HTML onclick handlers
+   * Phase 7: Expose global API
    * @private
    */
   #exposeGlobalAPI() {
-    // Temporary global API for HTML onclick attributes
-    // TODO: Migrate to full event delegation and remove this
+    // Small global API for debugging in the browser console
     window.hiderApp = {
       switchView: (view) => this.viewManager.switchView(view),
-      toggleSearch: () => this.#toggleSearch(),
-      toggleOverflowMenu: () => this.overflowMenu.toggle(),
-      closeOverflowMenu: () => this.overflowMenu.close(),
-      openSettings: () => this.settingsModal.open(),
-      closeSettings: () => this.settingsModal.close(),
       resetAll: () => this.#resetAll(),
       clearHistory: () => this.#clearHistory()
     };
@@ -259,36 +248,7 @@ class HiderApp {
   #handleUndo() {
     const action = this.state.undo();
     if (action) {
-      this.toast.show('UNDONE', false);
-    }
-  }
-
-  /**
-   * Toggle search visibility
-   * @private
-   */
-  #toggleSearch() {
-    const searchContainer = document.getElementById('search-container');
-    const searchInput = document.getElementById('search-input');
-    const currentView = this.viewManager.getCurrentView();
-
-    const isActive = !searchContainer.classList.contains('hidden');
-
-    if (isActive) {
-      // Close search
-      searchContainer.classList.add('hidden');
-      this.searchService.clear();
-      this.#hideSearchMessage();
-    } else {
-      // Open search
-      searchContainer.classList.remove('hidden');
-
-      if (currentView === 'history') {
-        this.#showSearchMessage('Switch to Detail or Overview view to search questions');
-      } else {
-        this.#hideSearchMessage();
-        setTimeout(() => searchInput.focus(), 100);
-      }
+      this.toast.show('Undone', false);
     }
   }
 
@@ -302,29 +262,10 @@ class HiderApp {
     if (!query) {
       countElement.textContent = '';
     } else if (matching === 0) {
-      countElement.textContent = 'No questions found';
+      countElement.textContent = 'No questions match your search';
     } else {
-      countElement.textContent = `Found ${matching} question${matching !== 1 ? 's' : ''}`;
+      countElement.textContent = `${matching} question${matching !== 1 ? 's' : ''} found`;
     }
-  }
-
-  /**
-   * Show search message
-   * @private
-   */
-  #showSearchMessage(message) {
-    const messageElement = document.getElementById('search-message');
-    messageElement.textContent = message;
-    messageElement.classList.remove('hidden');
-  }
-
-  /**
-   * Hide search message
-   * @private
-   */
-  #hideSearchMessage() {
-    const messageElement = document.getElementById('search-message');
-    messageElement.classList.add('hidden');
   }
 
   /**
@@ -334,7 +275,7 @@ class HiderApp {
   #resetAll() {
     if (confirm('Reset all questions and clear history?')) {
       this.state.reset();
-      this.toast.show('RESET COMPLETE', false);
+      this.toast.show('All questions reset', false);
     }
   }
 
@@ -345,7 +286,7 @@ class HiderApp {
   #clearHistory() {
     if (confirm('Clear question history?')) {
       this.state.clearHistory();
-      this.toast.show('HISTORY CLEARED', false);
+      this.toast.show('History cleared', false);
     }
   }
 }

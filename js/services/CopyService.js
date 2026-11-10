@@ -67,13 +67,13 @@ export class CopyService {
       this.state.markQuestionAsUsed(key, { category, title, question });
 
       // Show feedback
-      const toastMessage = strategy === 'deeplink' ? 'OPENING WHATSAPP' : 'COPIED TO CLIPBOARD';
+      const toastMessage = strategy === 'deeplink' ? 'Opening WhatsApp' : 'Copied to clipboard';
       const showUndo = strategy !== 'deeplink';
       this.toast.show(toastMessage, showUndo);
 
     } catch (error) {
       console.error('CopyService: Failed to copy question:', error);
-      this.toast.show('COPY FAILED', false);
+      this.toast.show('Could not copy the question. Try again.', false, 'error');
     }
   }
 
@@ -91,11 +91,11 @@ export class CopyService {
       // Always use clipboard for start messages (never deeplink)
       await this.#copyToClipboard(message);
 
-      this.toast.show('COPIED TO CLIPBOARD', false);
+      this.toast.show('Copied to clipboard', false);
 
     } catch (error) {
       console.error('CopyService: Failed to copy thermometer start:', error);
-      this.toast.show('COPY FAILED', false);
+      this.toast.show('Could not copy the question. Try again.', false, 'error');
     }
   }
 
@@ -112,11 +112,11 @@ export class CopyService {
       // Always use clipboard for history (never mark as used again)
       await this.#copyToClipboard(message);
 
-      this.toast.show('COPIED TO CLIPBOARD', false);
+      this.toast.show('Copied to clipboard', false);
 
     } catch (error) {
       console.error('CopyService: Failed to copy from history:', error);
-      this.toast.show('COPY FAILED', false);
+      this.toast.show('Could not copy the question. Try again.', false, 'error');
     }
   }
 

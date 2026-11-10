@@ -1,10 +1,12 @@
 import { EventDelegator } from '../../utils/events.js';
+import { sentenceCase, setCategoryColours, iconBoxHTML, updateProgress } from '../../utils/dom.js';
 
 /**
- * OverviewRenderer - Renders the overview grid with icon-based cards
+ * OverviewRenderer - Renders all questions as a compact grid of icon tiles
  *
- * Similar to DetailRenderer but with a compact grid layout
- * Shows category-colored icons with checkmarks for used questions
+ * Each category starts with a short band in its colour. Asked questions
+ * are grey with a tick.
+ * Select an asked question again to mark it as not asked.
  */
 export class OverviewRenderer {
   #container;
@@ -15,7 +17,6 @@ export class OverviewRenderer {
   #searchService = null;
 
   /**
-   * Create a new OverviewRenderer
    * @param {HTMLElement} container - The container element
    * @param {QuestionService} questionService - The question service
    * @param {CopyService} copyService - The copy service
@@ -36,27 +37,21 @@ export class OverviewRenderer {
      PUBLIC API
      ============================================ */
 
-  /**
-   * Render overview grid
-   */
   render() {
     this.#container.innerHTML = '';
 
     const questionsData = this.#questionService.getAllCategories();
     for (const [categoryKey, categoryData] of Object.entries(questionsData)) {
-      const section = this.#renderCategory(categoryKey, categoryData);
-      this.#container.appendChild(section);
+      this.#container.appendChild(this.#renderCategory(categoryKey, categoryData));
     }
+    updateProgress(this.#container, '.overview-card', 'app-overview-card--used');
   }
 
   /**
-   * Set the search service for filtering
    * @param {SearchService} searchService - The search service
    */
   setSearchService(searchService) {
     this.#searchService = searchService;
-
-    // Register callback for search results
     this.#searchService.onSearchResults(this.#handleSearchResults.bind(this));
   }
 
@@ -66,8 +61,7 @@ export class OverviewRenderer {
 
   #setupEventDelegation() {
     this.#events.on('.overview-card', 'click', (event, card) => {
-      const questionData = this.#extractQuestionData(card);
-      this.#copyService.handleCopy('overview', questionData, { allowToggle: true });
+      this.#copyService.handleCopy('overview', this.#extractQuestionData(card), { allowToggle: true });
     });
   }
 
@@ -95,52 +89,44 @@ export class OverviewRenderer {
 
   #renderCategory(categoryKey, categoryData) {
     const section = document.createElement('section');
+    section.className = 'app-overview-category';
+    section.dataset.categoryKey = categoryKey;
+    setCategoryColours(section, categoryData);
 
-    // Header
-    const header = document.createElement('div');
-    header.className = `${categoryKey}-header text-white p-3`;
-    header.style.borderRadius = '4px 4px 0 0';
-    header.innerHTML = `<h2 class="text-lg font-bold tracking-wide uppercase">${categoryData.title}</h2>`;
-    section.appendChild(header);
+    section.innerHTML = `
+      <div class="app-band app-band--compact">
+        <div class="app-band__title-row">
+          <span class="app-icon" aria-hidden="true">${categoryData.icon || 'help'}</span>
+          <h2 class="govuk-heading-m app-band__heading">${sentenceCase(categoryData.title)}</h2>
+          <span class="app-band__progress"></span>
+        </div>
+      </div>
+    `;
 
-    // Content
-    const content = document.createElement('div');
-    content.className = 'bg-white border-2 border-t-0 border-gray-200 p-3';
-    content.style.borderRadius = '0 0 4px 4px';
-
-    // Render question groups
     categoryData.questions.forEach(group => {
       if (group.subcategory) {
-        const subcategoryHeader = document.createElement('div');
-        subcategoryHeader.className = 'overview-subcategory';
-        subcategoryHeader.innerHTML = `
-          <span class="w-2 h-2 rounded-full bg-current mr-2"></span>
-          ${group.subcategory}
-        `;
-        content.appendChild(subcategoryHeader);
+        const subheading = document.createElement('h3');
+        subheading.className = 'govuk-heading-s govuk-!-margin-bottom-2';
+        subheading.textContent = group.subcategory;
+        section.appendChild(subheading);
       }
 
-      // Create grid
       const grid = document.createElement('div');
-      grid.className = 'overview-grid';
-
+      grid.className = 'app-overview-grid';
       group.items.forEach(item => {
-        const card = this.#createOverviewCard(categoryKey, categoryData, item);
-        grid.appendChild(card);
+        grid.appendChild(this.#createOverviewCard(categoryData, item));
       });
-
-      content.appendChild(grid);
+      section.appendChild(grid);
     });
 
-    section.appendChild(content);
     return section;
   }
 
-  #createOverviewCard(categoryKey, categoryData, item) {
-    const card = document.createElement('div');
-    card.className = `overview-card ${categoryKey}-card cursor-pointer transition-all`;
+  #createOverviewCard(categoryData, item) {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'govuk-button govuk-button--secondary overview-card app-overview-card';
 
-    // Set data attributes
     card.dataset.category = categoryData.title;
     card.dataset.title = item.title;
     card.dataset.question = item.question;
@@ -148,22 +134,12 @@ export class OverviewRenderer {
     card.dataset.note = item.note || '';
     card.dataset.reward = categoryData.reward;
 
-    // Check if used
-    const key = `${categoryData.title}:${item.title}`;
-    const isUsed = this.#stateManager.isQuestionUsed(categoryData.title, item.title);
-    if (isUsed) {
-      card.classList.add('overview-card-used');
-    }
-
     card.innerHTML = `
-      <div class="overview-card-icon-wrapper">
-        <div class="icon-shape ${categoryKey}-card">
-          <span class="material-symbols-outlined">${item.icon}</span>
-        </div>
-        ${isUsed ? '<span class="overview-checkmark material-symbols-outlined">check_circle</span>' : ''}
-      </div>
-      <div class="overview-card-title">${item.title}</div>
+      ${iconBoxHTML(item.icon)}
+      <span>${item.title}</span>
+      <span class="govuk-visually-hidden app-overview-card__status"></span>
     `;
+    this.#setCardUsed(card, this.#stateManager.isQuestionUsed(categoryData.title, item.title));
 
     return card;
   }
@@ -172,82 +148,56 @@ export class OverviewRenderer {
      PRIVATE - STATE UPDATES
      ============================================ */
 
-  #updateCardUsedState(category, title, isUsed) {
-    const cards = this.#container.querySelectorAll(
-      `[data-category="${category}"][data-title="${title}"]`
-    );
+  #setCardUsed(card, isUsed) {
+    card.classList.toggle('app-overview-card--used', isUsed);
+    card.setAttribute('aria-pressed', String(isUsed));
+    const status = card.querySelector('.app-overview-card__status');
+    if (status) status.textContent = isUsed ? ' (asked)' : '';
 
-    cards.forEach(card => {
-      if (isUsed) {
-        card.classList.add('overview-card-used');
-        // Add checkmark
-        const iconWrapper = card.querySelector('.overview-card-icon-wrapper');
-        if (iconWrapper && !card.querySelector('.overview-checkmark')) {
-          const checkmark = document.createElement('span');
-          checkmark.className = 'overview-checkmark material-symbols-outlined';
-          checkmark.textContent = 'check_circle';
-          iconWrapper.appendChild(checkmark);
-        }
-      } else {
-        card.classList.remove('overview-card-used');
-        // Remove checkmark
-        const checkmark = card.querySelector('.overview-checkmark');
-        if (checkmark) {
-          checkmark.remove();
-        }
+    let tick = card.querySelector('.app-overview-card__tick');
+    if (isUsed && !tick) {
+      tick = document.createElement('span');
+      tick.className = 'app-icon app-overview-card__tick';
+      tick.setAttribute('aria-hidden', 'true');
+      tick.textContent = 'check';
+      card.appendChild(tick);
+    } else if (!isUsed && tick) {
+      tick.remove();
+    }
+  }
+
+  #updateCardUsedState(category, title, isUsed) {
+    this.#container.querySelectorAll('.overview-card').forEach(card => {
+      if (card.dataset.category === category && card.dataset.title === title) {
+        this.#setCardUsed(card, isUsed);
       }
     });
+    updateProgress(this.#container, '.overview-card', 'app-overview-card--used');
   }
 
   /* ============================================
      PRIVATE - SEARCH/FILTER
      ============================================ */
 
-  /**
-   * Handle search results (show/hide cards based on matches)
-   * @private
-   * @param {object} results - { matches: Set, total: number, query: string }
-   */
-  #handleSearchResults({ matches, total, query }) {
+  #handleSearchResults({ matches, query }) {
     if (!query) {
-      // Show all cards and sections
-      this.#showAllCards();
+      this.#container.querySelectorAll('.hidden').forEach(el => el.classList.remove('hidden'));
       return;
     }
 
-    // Filter cards based on matches
-    const cards = this.#container.querySelectorAll('.overview-card');
-
-    cards.forEach(card => {
-      const key = `${card.dataset.category}:${card.dataset.title}`;
-      if (matches.has(key)) {
-        card.style.display = '';
-      } else {
-        card.style.display = 'none';
-      }
-    });
-
-    // Hide empty sections
-    this.#container.querySelectorAll('section').forEach(section => {
-      const visibleCards = section.querySelectorAll('.overview-card:not([style*="display: none"])');
-      if (visibleCards.length === 0) {
-        section.style.display = 'none';
-      } else {
-        section.style.display = '';
-      }
-    });
-  }
-
-  /**
-   * Show all cards (clear search filter)
-   * @private
-   */
-  #showAllCards() {
     this.#container.querySelectorAll('.overview-card').forEach(card => {
-      card.style.display = '';
+      card.classList.toggle('hidden', !matches.has(`${card.dataset.category}:${card.dataset.title}`));
     });
+
+    this.#container.querySelectorAll('.app-overview-grid').forEach(grid => {
+      const empty = !grid.querySelector('.overview-card:not(.hidden)');
+      grid.classList.toggle('hidden', empty);
+      const prev = grid.previousElementSibling;
+      if (prev && prev.tagName === 'H3') prev.classList.toggle('hidden', empty);
+    });
+
     this.#container.querySelectorAll('section').forEach(section => {
-      section.style.display = '';
+      section.classList.toggle('hidden', !section.querySelector('.overview-card:not(.hidden)'));
     });
   }
 

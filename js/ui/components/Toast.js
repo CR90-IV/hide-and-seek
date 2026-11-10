@@ -1,11 +1,9 @@
 /**
- * Toast - Toast notification component
+ * Toast - Short confirmation message after a copy
  *
- * Encapsulates toast notification logic with:
- * - Configurable messages
- * - Optional undo button
- * - Auto-hide with timeout
- * - Manual show/hide controls
+ * Uses the GOV.UK notification banner styles, fixed to the bottom of the screen.
+ * - type 'success' (default): green banner
+ * - type 'error': blue (default) banner, because the copy did not happen
  */
 export class Toast {
   #element;
@@ -14,7 +12,6 @@ export class Toast {
   #currentTimeout = null;
 
   /**
-   * Create a new Toast component
    * @param {string} elementId - ID of the toast container element
    */
   constructor(elementId = 'toast') {
@@ -27,50 +24,27 @@ export class Toast {
     }
   }
 
-  /* ============================================
-     PUBLIC API
-     ============================================ */
-
   /**
-   * Show toast notification
-   * @param {string} message - The message to display (default: 'COPIED TO CLIPBOARD')
-   * @param {boolean} showUndo - Whether to show the undo button (default: false)
+   * @param {string} message - The message to show
+   * @param {boolean} showUndo - Show the Undo button
+   * @param {'success'|'error'} type - Banner type
    */
-  show(message = 'COPIED TO CLIPBOARD', showUndo = false) {
-    // Update message
+  show(message = 'Copied to clipboard', showUndo = false, type = 'success') {
     this.#textElement.textContent = message;
-
-    // Toggle undo button
-    if (showUndo) {
-      this.#undoBtn.classList.remove('hidden');
-      this.#element.classList.add('toast-with-undo');
-    } else {
-      this.#undoBtn.classList.add('hidden');
-      this.#element.classList.remove('toast-with-undo');
-    }
-
-    // Show toast
+    this.#undoBtn.classList.toggle('hidden', !showUndo);
+    this.#element.classList.toggle('govuk-notification-banner--success', type === 'success');
     this.#element.classList.remove('hidden');
-    this.#element.classList.add('toast');
 
-    // Clear existing timeout
     if (this.#currentTimeout) {
       clearTimeout(this.#currentTimeout);
     }
 
-    // Auto-hide after delay
-    const duration = showUndo ? 4000 : 2000;
-    this.#currentTimeout = setTimeout(() => {
-      this.hide();
-    }, duration);
+    const duration = showUndo || type === 'error' ? 4000 : 2000;
+    this.#currentTimeout = setTimeout(() => this.hide(), duration);
   }
 
-  /**
-   * Hide toast notification
-   */
   hide() {
     this.#element.classList.add('hidden');
-    this.#element.classList.remove('toast', 'toast-with-undo');
 
     if (this.#currentTimeout) {
       clearTimeout(this.#currentTimeout);
@@ -79,7 +53,6 @@ export class Toast {
   }
 
   /**
-   * Get the undo button element for attaching event listeners
    * @returns {HTMLElement} The undo button element
    */
   getUndoButton() {
