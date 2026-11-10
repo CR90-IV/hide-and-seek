@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hider-cheat-sheet-v6';
+const CACHE_NAME = 'hider-cheat-sheet-v7';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

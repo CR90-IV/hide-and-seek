@@ -1,112 +1,70 @@
+import { sentenceCase } from '../utils/dom.js';
+
 /**
- * MessageFormatter - WhatsApp message formatting service
+ * MessageFormatter - builds the WhatsApp message for a question
  *
- * Eliminates 5 duplications of message formatting logic (~150 lines)
- * Provides consistent message formatting across the application
+ * The message must hold all the information the hider needs to answer:
+ * the question, the gaps the seekers fill in, the rules, the time limit
+ * and the reward.
  */
 export class MessageFormatter {
   /**
-   * Format a WhatsApp message for a question
-   * @param {string} category - The category name (e.g., "MATCHING")
-   * @param {string} title - The question title
-   * @param {string} question - The question text
-   * @param {string} answer - The answer format
-   * @param {string|null} note - Optional note
-   * @param {string} reward - The reward text
-   * @returns {string} Formatted WhatsApp message
+   * Format the message for a question
+   * @param {object} q - Full question data from QuestionService
+   * @returns {string} The message
    *
    * @example
-   * MessageFormatter.formatWhatsAppMessage(
-   *   "RADAR",
-   *   "1 mile",
-   *   "Are you within 1 mile of me?",
-   *   "YES or NO",
-   *   null,
-   *   "Draw 2, keep 1"
-   * );
-   * // Returns:
-   * // *RADAR: 1 mile*
-   * // Are you within 1 mile of me?
-   * // Answer: YES or NO
-   * // Reward: Draw 2, keep 1
+   * // *Radar: 1km*
+   * // Are you within 1km of me?
+   * // I am at: [location]
+   * //
+   * // _Answer for where you are now, not for your whole hiding zone._
+   * //
+   * // Answer within 5 minutes: yes or no.
+   * // Then draw 2 cards and keep 1.
    */
-  static formatWhatsAppMessage(category, title, question, answer, note, reward) {
-    let message = `*${category}: ${title}*\n`;
-    message += `${question}\n`;
-    message += `Answer: ${answer}\n`;
+  static formatQuestion(q) {
+    const lines = [`*${sentenceCase(q.category)}: ${q.title}*`, q.question];
+    if (q.fill) lines.push(...q.fill.split('\n'));
 
-    if (note) {
-      const plainTextNote = this.#convertLinksToPlainText(note);
-      message += `_${plainTextNote}_\n`;
+    const notes = [q.note, ...(q.rules || [])].filter(Boolean);
+    if (notes.length) {
+      lines.push('');
+      notes.forEach(note => lines.push(`_${this.#toPlainText(note)}_`));
     }
 
-    message += `Reward: ${reward}`;
+    lines.push('');
+    lines.push(`Answer within ${q.time}: ${q.answer}.`);
+    lines.push(q.reward);
 
-    return message;
+    return lines.join('\n');
   }
 
   /**
-   * Format a thermometer start message
-   * @param {string} distance - The distance (e.g., "3 miles")
-   * @returns {string} Formatted start message
-   *
-   * @example
-   * MessageFormatter.formatThermometerStart("3 miles");
-   * // Returns: "Starting a 3 miles thermometer"
+   * Format the message seekers send when they start a thermometer
+   * @param {object} q - Full question data for the thermometer
+   * @returns {string} The message
    */
-  static formatThermometerStart(distance) {
-    return `Starting a ${distance} thermometer`;
+  static formatThermometerStart(q) {
+    return [
+      `*${sentenceCase(q.category)}: ${q.title} (start)*`,
+      `We are starting a ${q.title} thermometer.`,
+      'Start: [location]',
+      '',
+      '_You do not need to answer yet._'
+    ].join('\n');
   }
 
   /**
-   * Format a question from history
-   * @param {object} historyEntry - The history entry { category, title, question }
-   * @param {object} questionData - The full question data from QuestionService
-   * @returns {string} Formatted WhatsApp message
-   */
-  static formatFromHistory(historyEntry, questionData) {
-    return this.formatWhatsAppMessage(
-      historyEntry.category,
-      historyEntry.title,
-      historyEntry.question,
-      questionData.answer,
-      questionData.note,
-      questionData.reward
-    );
-  }
-
-  /* ============================================
-     PRIVATE METHODS
-     ============================================ */
-
-  /**
-   * Convert HTML links to plain text with visible URLs
-   * Format: "link text: URL"
-   *
+   * Convert HTML to plain text. Links become "link text: URL".
    * @private
-   * @param {string} html - HTML string potentially containing links
-   * @returns {string} Plain text with URLs visible
-   *
-   * @example
-   * convertLinksToPlainText('See <a href="https://example.com">map</a>')
-   * // Returns: "See map: https://example.com"
    */
-  static #convertLinksToPlainText(html) {
-    if (!html) return html;
-
-    // Create a temporary element to parse HTML
+  static #toPlainText(html) {
     const temp = document.createElement('div');
     temp.innerHTML = html;
-
-    // Find all anchor tags and replace them with "text: URL" format
-    const links = temp.querySelectorAll('a');
-    links.forEach(link => {
-      const text = link.textContent;
-      const url = link.href;
-      const replacement = document.createTextNode(`${text}: ${url}`);
-      link.parentNode.replaceChild(replacement, link);
+    temp.querySelectorAll('a').forEach(link => {
+      link.replaceWith(document.createTextNode(`${link.textContent}: ${link.href}`));
     });
-
     return temp.textContent;
   }
 }

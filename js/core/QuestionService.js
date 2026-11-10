@@ -153,22 +153,10 @@ export class QuestionService {
 
     for (const [categoryKey, categoryData] of Object.entries(this.#questionsData)) {
       const category = categoryData.title; // e.g., "MATCHING"
-      const categoryAnswer = categoryData.answer;
-      const categoryReward = categoryData.reward;
-      const categoryNote = categoryData.note || '';
 
-      // Iterate through question groups
       for (const group of categoryData.questions) {
-        // Iterate through items in each group
         for (const item of group.items) {
-          this.#indexQuestion(
-            categoryKey,
-            category,
-            item,
-            categoryAnswer,
-            categoryReward,
-            categoryNote
-          );
+          this.#indexQuestion(categoryKey, category, categoryData, item);
           this.#totalQuestions++;
         }
       }
@@ -176,27 +164,25 @@ export class QuestionService {
   }
 
   /**
-   * Index a single question
+   * Index a single question. Item values override category defaults.
    * @private
    */
-  #indexQuestion(categoryKey, category, item, categoryAnswer, categoryReward, categoryNote) {
+  #indexQuestion(categoryKey, category, categoryData, item) {
     const key = `${category}:${item.title}`;
 
-    // Build full question data object
-    const questionData = {
+    this.#questionIndex.set(key, {
       categoryKey,          // e.g., "matching"
       category,             // e.g., "MATCHING"
       title: item.title,
       question: item.question,
       icon: item.icon,
-      answer: item.answer || categoryAnswer,    // Item can override category default
-      reward: item.reward || categoryReward,    // Item can override category default
-      note: item.note || categoryNote,          // Item note takes precedence
-      subtitle: item.subtitle || null           // For grid layout
-    };
-
-    // Add to main index
-    this.#questionIndex.set(key, questionData);
+      answer: item.answer || categoryData.answer,
+      time: item.time || categoryData.time,
+      reward: item.reward || categoryData.reward,
+      fill: item.fill ?? categoryData.fill ?? null,
+      note: item.note || null,
+      rules: categoryData.rules || []
+    });
   }
 
   /**

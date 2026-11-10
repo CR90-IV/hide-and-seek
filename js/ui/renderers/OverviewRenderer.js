@@ -129,10 +129,6 @@ export class OverviewRenderer {
 
     card.dataset.category = categoryData.title;
     card.dataset.title = item.title;
-    card.dataset.question = item.question;
-    card.dataset.answer = item.answer || categoryData.answer;
-    card.dataset.note = item.note || '';
-    card.dataset.reward = categoryData.reward;
 
     card.innerHTML = `
       ${iconBoxHTML(item.icon)}
@@ -206,7 +202,7 @@ export class OverviewRenderer {
      ============================================ */
 
   #extractQuestionData(element) {
-    const { category, title, question, answer, note, reward } = element.dataset;
-    return { category, title, question, answer, note, reward };
+    const { category, title } = element.dataset;
+    return { category, title };
   }
 }

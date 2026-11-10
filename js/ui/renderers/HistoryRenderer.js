@@ -57,14 +57,8 @@ export class HistoryRenderer {
 
   #setupEventDelegation() {
     this.#events.on('.history-copy-btn', 'click', (event, btn) => {
-      const { category, title, question } = btn.closest('.history-item').dataset;
-      const questionData = this.#questionService.getQuestion(category, title);
-
-      if (questionData) {
-        this.#copyService.copyFromHistory({ category, title, question }, questionData);
-      } else {
-        console.error(`HistoryRenderer: Question not found: ${category}:${title}`);
-      }
+      const { category, title } = btn.closest('.history-item').dataset;
+      this.#copyService.copyFromHistory({ category, title });
     });
   }
 
@@ -87,7 +81,6 @@ export class HistoryRenderer {
     row.className = 'govuk-summary-list__row history-item';
     row.dataset.category = item.category;
     row.dataset.title = item.title;
-    row.dataset.question = item.question;
 
     const date = new Date(item.timestamp);
     const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -106,7 +99,7 @@ export class HistoryRenderer {
           ${iconBoxHTML(questionData?.icon)}
           <div>
             <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">${sentenceCase(item.category)}: ${item.title}</p>
-            <p class="govuk-body-s govuk-!-margin-bottom-0">${item.question}</p>
+            <p class="govuk-body-s govuk-!-margin-bottom-0">${questionData?.question ?? item.question}</p>
           </div>
         </div>
       </dd>

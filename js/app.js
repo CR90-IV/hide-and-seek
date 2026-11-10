@@ -14,7 +14,7 @@
  */
 
 // Data
-import { questionsData } from '../questions-data.js';
+import { questionsData, renamedQuestions } from '../questions-data.js';
 
 // Core services
 import { StorageService } from './core/StorageService.js';
@@ -86,14 +86,14 @@ class HiderApp {
   #initializeServices() {
     // Core
     this.storage = new StorageService();
-    this.state = new StateManager(this.storage);
+    this.state = new StateManager(this.storage, renamedQuestions);
     this.questionService = new QuestionService(questionsData);
 
     // Toast needed by CopyService
     this.toast = new Toast('toast');
 
     // Services
-    this.copyService = new CopyService(this.state, this.toast);
+    this.copyService = new CopyService(this.state, this.toast, this.questionService);
     this.searchService = new SearchService(this.questionService, this.state);
   }
 

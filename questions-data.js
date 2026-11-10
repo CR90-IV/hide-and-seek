@@ -1,35 +1,64 @@
-// Question data structure
+// Question data
+//
+// Each category has:
+// - description: the question pattern, shown in the category band
+// - badges: short tags for the answer type, time limit and reward
+// - answer, time, reward: used in the copied message
+// - rules: rules for the hider. Shown once on screen and added to every message
+// - fill: a line the seekers fill in before they send. Items can override it
+// - seekerNote: help for the person using the app. Shown on screen only
+//
+// Each item has a title, question, icon and optional note, fill and answer.
+// The item note is shown on screen and added to the message.
+//
+// The copied message must hold all the information the hider needs to answer.
+
+const PIN = 'Measure to the Google Maps pin, not the edge.';
+const OUTSIDE = 'Ignore places outside the game area.';
+
+const link = (href, text) =>
+    `<a href="${href}" target="_blank" style="color: inherit; text-decoration: underline;">${text}</a>`;
+
+const RIVER_MAP = `See the ${link('https://content.tfl.gov.uk/riverservices-map.pdf', 'river bus map')}.`;
+
 export const questionsData = {
     matching: {
         color: '#232F41',
         textColor: '#ffffff', // Text and icon colour on the category colour (contrast 4.5:1 or more)
         icon: 'join',
         title: 'MATCHING',
-        description: '"Is your nearest ___ the same as my ___?"',
-        badges: ['YES / NO', '5 min', 'Draw 3, keep 1'],
-        answer: 'YES or NO',
-        reward: 'Draw 3, keep 1',
-        note: "Seekers should say which item is their nearest. Treat locations outside map boundaries as if they don't exist. A null answer still counts and the hider still draws.",
+        description: '"Is your nearest ___ the same as mine?"',
+        badges: ['Yes or no', '5 minutes', 'Draw 3, keep 1'],
+        answer: 'yes or no',
+        time: '5 minutes',
+        reward: 'Then draw 3 cards and keep 1.',
+        fill: 'Mine is: [fill in]',
+        rules: [
+            OUTSIDE,
+            'The question counts even if there is none in the game area.'
+        ],
         questions: [
             {
                 subcategory: 'Transport',
                 items: [
                     {
                         title: 'Train service',
-                        question: 'Does my train stop at your station?',
-                        note: "",
+                        question: 'Does the train I am on stop at your station?',
+                        fill: 'My train: [line] towards [last stop]',
                         icon: 'directions_transit'
                     },
                     {
-                        title: "Station name length",
-                        question: "Is the length of your station's name the same as mine?",
-                        note: "Count all characters including hyphens/spaces/'station'",
+                        title: 'Station name length',
+                        question: "Is your station's name the same length as mine?",
+                        fill: 'Mine is: [station name] ([number] characters)',
+                        note: 'Count every letter, space and hyphen. Include the word "Station".',
                         icon: 'text_fields'
                     },
                     {
-                        title: "Night tube status",
-                        question: "Does your station have the same night tube service as mine?",
-                        note: 'See <a href="https://content.tfl.gov.uk/standard-night-tube-map.pdf" target="_blank" style="color: inherit; text-decoration: underline;">map of Night tube services</a>. Ignore temporary closures.',
+                        title: 'Night Tube service',
+                        question: 'Does your station have the same Night Tube service as mine?',
+                        fill: 'My station: [station name]',
+                        note: `See the ${link('https://content.tfl.gov.uk/standard-night-tube-map.pdf', 'Night Tube map')}. Ignore short-term closures.`,
                         icon: 'owl'
                     },
                     {
@@ -45,36 +74,35 @@ export const questionsData = {
                     {
                         title: 'River bus pier',
                         question: 'Is your nearest river bus pier the same as mine?',
-                        note: 'See <a href="https://content.tfl.gov.uk/riverservices-map.pdf" target="_blank" style="color: inherit; text-decoration: underline;">map of London river services</a>.',
+                        note: RIVER_MAP,
                         icon: 'directions_boat'
                     },
                     {
                         title: 'Commercial airport',
                         question: 'Is your nearest commercial airport the same as mine?',
-                        note: 'Verify via Google Flights',
+                        note: 'It must have flights on Google Flights.',
                         icon: 'flight'
                     }
                 ]
             },
             {
-                subcategory: 'Administrative',
+                subcategory: 'Areas',
                 items: [
                     {
                         title: 'London borough',
-                        question: 'Is your London Borough the same as mine?',
-                        note: '',
+                        question: 'Is your London borough the same as mine?',
                         icon: 'globe_uk'
                     },
                     {
                         title: 'Postcode area',
                         question: 'Is your postcode area the same as mine?',
-                        note: 'e.g. [WC]2N 5DS',
+                        note: 'The area is the first letters. In WC2N 5DS, it is WC.',
                         icon: 'local_post_office'
                     },
                     {
                         title: 'Postcode district',
                         question: 'Is your postcode district the same as mine?',
-                        note: 'e.g. [WC2]N 5DS',
+                        note: 'The district is the first half. In WC2N 5DS, it is WC2N.',
                         icon: 'local_post_office'
                     }
                 ]
@@ -85,13 +113,13 @@ export const questionsData = {
                     {
                         title: 'Landmass',
                         question: 'Is your landmass the same as mine?',
-                        note: 'See <a href="https://canoelondon.com/wordpress/wp-content/uploads/2012/02/London_waterways.pdf" target="_blank" style="color: inherit; text-decoration: underline;">map of London waterways</a>; e.g. opposite banks of Thames are separate landmasses',
+                        note: `Land on each side of a river or canal is a different landmass. For example, the north and south banks of the Thames. See the ${link('https://canoelondon.com/wordpress/wp-content/uploads/2012/02/London_waterways.pdf', 'London waterways map')}.`,
                         icon: 'terrain'
                     },
                     {
                         title: 'Park',
                         question: 'Is your nearest park the same as mine?',
-                        note: 'Measure to map icon (not to boundary)',
+                        note: PIN,
                         icon: 'forest'
                     }
                 ]
@@ -102,71 +130,71 @@ export const questionsData = {
                     {
                         title: 'Street or path',
                         question: 'Is your nearest street or path the same as mine?',
-                        note: 'Ends when name changes, including East/West',
+                        note: 'A street ends where its name changes. "East" and "West" count as different names.',
                         icon: 'follow_the_signs'
                     }
                 ]
             },
             {
-                subcategory: 'Places of Interest',
+                subcategory: 'Places to visit',
                 items: [
                     {
                         title: 'Museum',
                         question: 'Is your nearest museum the same as mine?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'museum'
                     },
                     {
                         title: 'Cinema',
                         question: 'Is your nearest cinema the same as mine?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'movie'
                     },
                     {
                         title: 'Amusement park',
                         question: 'Is your nearest amusement park the same as mine?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'attractions'
                     },
                     {
                         title: 'Zoo',
                         question: 'Is your nearest zoo the same as mine?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'pets'
                     },
                     {
                         title: 'Aquarium',
                         question: 'Is your nearest aquarium the same as mine?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'water'
                     },
                     {
                         title: 'Golf course',
                         question: 'Is your nearest golf course the same as mine?',
-                        note: 'Outdoor only, no mini/driving range, measure to map icon',
+                        note: `Full outdoor courses only. Not mini golf or driving ranges. ${PIN}`,
                         icon: 'golf_course'
                     }
                 ]
             },
             {
-                subcategory: 'Public Utilities',
+                subcategory: 'Public services',
                 items: [
                     {
                         title: 'Hospital',
                         question: 'Is your nearest hospital the same as mine?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'local_hospital'
                     },
                     {
                         title: 'Library',
                         question: 'Is your nearest library the same as mine?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'local_library'
                     },
                     {
                         title: 'Foreign consulate',
                         question: 'Is your nearest foreign consulate the same as mine?',
-                        note: 'Exclude honorary consulates, measure to map icon',
+                        note: `Not honorary consulates. ${PIN}`,
                         icon: 'passport'
                     }
                 ]
@@ -179,18 +207,20 @@ export const questionsData = {
         icon: 'straighten',
         title: 'MEASURING',
         description: '"Compared to me, are you closer to or further from ___?"',
-        badges: ['CLOSER / FURTHER', '5 min', 'Draw 3, keep 1'],
-        answer: 'CLOSER or FURTHER',
-        reward: 'Draw 3, keep 1',
-        note: "Seekers should say how far they are from the relevant item.",
+        badges: ['Closer or further', '5 minutes', 'Draw 3, keep 1'],
+        answer: 'closer or further',
+        time: '5 minutes',
+        reward: 'Then draw 3 cards and keep 1.',
+        fill: 'My distance to the nearest one: [distance]',
+        rules: [OUTSIDE],
         questions: [
             {
-                subcategory: 'Transit-Related',
+                subcategory: 'Transport',
                 items: [
                     {
                         title: 'Rail station',
                         question: 'Compared to me, are you closer to or further from a rail station?',
-                        note: 'London Underground, DLR and National Rail count',
+                        note: 'Tube, DLR and National Rail stations count.',
                         icon: 'train'
                     },
                     {
@@ -206,36 +236,34 @@ export const questionsData = {
                     {
                         title: 'River bus pier',
                         question: 'Compared to me, are you closer to or further from a river bus pier?',
-                        note: 'See <a href="https://content.tfl.gov.uk/riverservices-map.pdf" target="_blank" style="color: inherit; text-decoration: underline;">map of London river services</a>.',
+                        note: RIVER_MAP,
                         icon: 'directions_boat'
                     },
                     {
                         title: 'High-speed train line',
                         question: 'Compared to me, are you closer to or further from a high-speed train line?',
-                        note: 'i.e. GWR from Paddington; HS1 from St Pancras; ECML from King\'s Cross; WCML from Euston',
+                        note: "This means the main lines out of Paddington, St Pancras, King's Cross and Euston.",
                         icon: 'directions_railway'
                     },
                     {
                         title: 'Commercial airport',
                         question: 'Compared to me, are you closer to or further from a commercial airport?',
-                        note: 'Verify via Google Flights',
+                        note: 'It must have flights on Google Flights.',
                         icon: 'flight'
                     }
                 ]
             },
             {
-                subcategory: 'Borders & Administrative',
+                subcategory: 'Borders',
                 items: [
                     {
                         title: 'London borough border',
-                        question: 'Compared to me, are you closer to or further from a London Borough border?',
-                        note: '',
+                        question: 'Compared to me, are you closer to or further from a London borough border?',
                         icon: 'globe_uk'
                     },
                     {
                         title: 'Greater London boundary',
                         question: 'Compared to me, are you closer to or further from the Greater London boundary?',
-                        note: '',
                         icon: 'crop_free'
                     }
                 ]
@@ -246,84 +274,85 @@ export const questionsData = {
                     {
                         title: 'Sea level',
                         question: 'Compared to me, are you closer to or further from sea level?',
-                        answer: 'CLOSER, FURTHER, or AMBIGUOUS',
-                        note: 'i.e. your altitude; answer AMBIGUOUS if unclear/too similar (still counts)',
+                        fill: 'My height above sea level: [metres]',
+                        answer: 'closer, further, or "too close to tell"',
+                        note: 'If the heights are too close to tell, say so. The question still counts.',
                         icon: 'altitude'
                     },
                     {
                         title: 'Body of water',
                         question: 'Compared to me, are you closer to or further from a body of water?',
-                        note: 'Any named body on Google Maps, not pools',
+                        note: 'Any water with a name on Google Maps. Not pools.',
                         icon: 'water'
                     },
                     {
                         title: 'Park',
                         question: 'Compared to me, are you closer to or further from a park?',
-                        note: 'Measure to map icon (not boundary)',
+                        note: PIN,
                         icon: 'forest'
                     }
                 ]
             },
             {
-                subcategory: 'Places of Interest',
+                subcategory: 'Places to visit',
                 items: [
                     {
                         title: 'Museum',
                         question: 'Compared to me, are you closer to or further from a museum?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'museum'
                     },
                     {
                         title: 'Cinema',
                         question: 'Compared to me, are you closer to or further from a cinema?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'movie'
                     },
                     {
                         title: 'Amusement park',
                         question: 'Compared to me, are you closer to or further from an amusement park?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'attractions'
                     },
                     {
                         title: 'Zoo',
                         question: 'Compared to me, are you closer to or further from a zoo?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'pets'
                     },
                     {
                         title: 'Aquarium',
                         question: 'Compared to me, are you closer to or further from an aquarium?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'water'
                     },
                     {
                         title: 'Golf course',
                         question: 'Compared to me, are you closer to or further from a golf course?',
-                        note: 'Measure to map icon',
+                        note: `Full outdoor courses only. Not mini golf or driving ranges. ${PIN}`,
                         icon: 'golf_course'
                     }
                 ]
             },
             {
-                subcategory: 'Public Utilities',
+                subcategory: 'Public services',
                 items: [
                     {
                         title: 'Hospital',
                         question: 'Compared to me, are you closer to or further from a hospital?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'local_hospital'
                     },
                     {
                         title: 'Library',
                         question: 'Compared to me, are you closer to or further from a library?',
-                        note: 'Measure to map icon',
+                        note: PIN,
                         icon: 'local_library'
                     },
                     {
                         title: 'Foreign consulate',
                         question: 'Compared to me, are you closer to or further from a foreign consulate?',
-                        note: 'Measure to map icon',
+                        note: `Not honorary consulates. ${PIN}`,
                         icon: 'passport'
                     }
                 ]
@@ -336,62 +365,24 @@ export const questionsData = {
         icon: 'radar',
         title: 'RADAR',
         description: '"Are you within ___ of me?"',
-        badges: ['YES / NO', '5 min', 'Draw 2, keep 1'],
-        answer: 'YES or NO',
-        reward: 'Draw 2, keep 1',
-        note: 'Hiders answer based on their location, not their hiding zone',
+        badges: ['Yes or no', '5 minutes', 'Draw 2, keep 1'],
+        answer: 'yes or no',
+        time: '5 minutes',
+        reward: 'Then draw 2 cards and keep 1.',
+        fill: 'I am at: [location]',
+        rules: ['Answer for where you are now, not for your whole hiding zone.'],
         gridCols: 2,
         questions: [
             {
                 items: [
-                    {
-                        title: '500m',
-                        question: 'Are you within 500m of me?',
-                        note: 'Answer based on your location, not your hiding zone',
-                        icon: 'my_location'
-                    },
-                    {
-                        title: '1km',
-                        question: 'Are you within 1km of me?',
-                        note: 'Answer based on your location, not your hiding zone',
-                        icon: 'my_location'
-                    },
-                    {
-                        title: '2km',
-                        question: 'Are you within 2km of me?',
-                        note: 'Answer based on your location, not your hiding zone',
-                        icon: 'my_location'
-                    },
-                    {
-                        title: '5km',
-                        question: 'Are you within 5km of me?',
-                        note: 'Answer based on your location, not your hiding zone',
-                        icon: 'my_location'
-                    },
-                    {
-                        title: '10km',
-                        question: 'Are you within 10km of me?',
-                        note: 'Answer based on your location, not your hiding zone',
-                        icon: 'my_location'
-                    },
-                    {
-                        title: '15km',
-                        question: 'Are you within 15km of me?',
-                        note: 'Answer based on your location, not your hiding zone',
-                        icon: 'my_location'
-                    },
-                    {
-                        title: '40km',
-                        question: 'Are you within 40km of me?',
-                        note: 'Answer based on your location, not your hiding zone',
-                        icon: 'my_location'
-                    },
-                    {
-                        title: 'Custom',
-                        question: 'Are you within [DISTANCE] of me?',
-                        note: 'Answer based on your location, not your hiding zone',
-                        icon: 'my_location',
-                    }
+                    { title: '500m', question: 'Are you within 500m of me?', icon: 'my_location' },
+                    { title: '1km', question: 'Are you within 1km of me?', icon: 'my_location' },
+                    { title: '2km', question: 'Are you within 2km of me?', icon: 'my_location' },
+                    { title: '5km', question: 'Are you within 5km of me?', icon: 'my_location' },
+                    { title: '10km', question: 'Are you within 10km of me?', icon: 'my_location' },
+                    { title: '15km', question: 'Are you within 15km of me?', icon: 'my_location' },
+                    { title: '40km', question: 'Are you within 40km of me?', icon: 'my_location' },
+                    { title: 'Custom', question: 'Are you within [distance] of me?', icon: 'my_location' }
                 ]
             }
         ]
@@ -401,32 +392,20 @@ export const questionsData = {
         textColor: '#0b0c0c', // Text and icon colour on the category colour (contrast 4.5:1 or more)
         icon: 'thermostat',
         title: 'THERMOMETER',
-        description: '"After traveling ___, am I hotter or colder?"',
-        badges: ['HOTTER / COLDER', '5 min', 'Draw 2, keep 1'],
-        answer: 'HOTTER (closer) or COLDER (farther)',
-        reward: 'Draw 2, keep 1',
-        note: 'Seekers say when they are starting a thermometer. When ending a thermometer, seekers provide their start and end locations. Distance measured as the crow flies.',
+        description: '"We have travelled ___. Are we hotter or colder?"',
+        badges: ['Hotter or colder', '5 minutes', 'Draw 2, keep 1'],
+        answer: 'hotter (we are closer to you) or colder (we are further away)',
+        time: '5 minutes',
+        reward: 'Then draw 2 cards and keep 1.',
+        fill: 'Start: [location]\nEnd: [location]',
+        rules: ['Measure in a straight line from start to end.'],
+        seekerNote: 'Select Start when you set off. Select End when you have travelled the distance.',
         questions: [
             {
                 items: [
-                    {
-                        title: '1km',
-                        question: 'After traveling 1km, am I hotter or colder?',
-                        note: 'Measured as the crow flies from start to end point',
-                        icon: 'thermostat'
-                    },
-                    {
-                        title: '5km',
-                        question: 'After traveling 5km, am I hotter or colder?',
-                        note: 'Measured as the crow flies from start to end point',
-                        icon: 'thermostat'
-                    },
-                    {
-                        title: '15km',
-                        question: 'After traveling 15km, am I hotter or colder?',
-                        note: 'Measured as the crow flies from start to end point',
-                        icon: 'thermostat'
-                    }
+                    { title: '1km', question: 'We have travelled 1km. Are we hotter or colder?', icon: 'thermostat' },
+                    { title: '5km', question: 'We have travelled 5km. Are we hotter or colder?', icon: 'thermostat' },
+                    { title: '15km', question: 'We have travelled 15km. Are we hotter or colder?', icon: 'thermostat' }
                 ]
             }
         ]
@@ -436,128 +415,131 @@ export const questionsData = {
         textColor: '#0b0c0c', // Text and icon colour on the category colour (contrast 4.5:1 or more)
         icon: 'photo_camera',
         title: 'PHOTO',
-        description: '"Send a photo of ___"',
-        badges: ['Photo / Cannot answer', '10 min', 'Draw 1, keep 1'],
-        answer: "Photo or 'I cannot answer the question'",
-        reward: 'Draw 1, keep 1',
-        note: 'Normal phone aspect ratio. No Google Street View allowed. Hider can redact identifying text and logos.',
+        description: '"Send a photo of ___."',
+        badges: ['Photo', '10 minutes', 'Draw 1, keep 1'],
+        answer: 'a photo, or "I cannot answer" if there is none in your hiding zone',
+        time: '10 minutes',
+        reward: 'Then draw 1 card and keep it.',
+        rules: [
+            "Use your phone's normal photo shape. Do not crop.",
+            'Do not use Google Street View.',
+            'You can cover names, signs and logos.'
+        ],
         questions: [
             {
-                subcategory: 'Selfie & Environment',
+                subcategory: 'You and what is around you',
                 items: [
                     {
-                        title: 'You (selfie)',
-                        question: 'Send a photo of you (selfie).',
-                        note: 'Arm extended, phone perpendicular to ground, default lens',
+                        title: 'Selfie',
+                        question: 'Send a selfie.',
+                        note: 'Hold the phone upright at arm\'s length. Use the 1x lens.',
                         icon: 'face'
                     },
                     {
                         title: 'Sky',
                         question: 'Send a photo of the sky.',
-                        note: 'Phone on ground, facing directly up, default lens',
+                        note: 'Put the phone flat on the ground, camera facing up. Use the 1x lens.',
                         icon: 'cloud'
                     },
                     {
                         title: 'Ground',
                         question: 'Send a photo of the ground.',
-                        note: 'Phone at arm level, facing directly down, default lens',
+                        note: 'Hold the phone out at arm\'s length, camera facing straight down. Use the 1x lens.',
                         icon: 'grass'
                     }
                 ]
             },
             {
-                subcategory: 'Structures & Buildings',
+                subcategory: 'Buildings',
                 items: [
                     {
-                        title: 'Structure with highest elevation in your sightline',
-                        question: 'Send a photo of the structure with highest angle of elevation from your sightline.',
-                        note: 'Include top + both sides, top in top 1/3 of frame',
+                        title: 'Tallest structure you can see',
+                        question: 'Send a photo of the tallest-looking structure you can see.',
+                        note: 'Tallest-looking means the one you look up at most. Show its top and both sides. Put the top in the top third of the photo.',
                         icon: 'apartment'
                     },
                     {
-                        title: 'Structure with highest elevation from station',
-                        question: 'Send a photo of the structure with highest angle of elevation from an entrance of your station.',
-                        note: "Your choice of entrance; top + both sides, top in top 1/3 of frame; station building doesn't count unless building above has separate purpose",
+                        title: 'Tallest structure seen from station',
+                        question: 'Stand at an entrance to your station. Send a photo of the tallest-looking structure you can see.',
+                        note: 'You choose the entrance. Show its top and both sides. Put the top in the top third of the photo. The station does not count, unless the building above it has a different use.',
                         icon: 'domain'
                     },
                     {
-                        title: 'Any building visible from station',
-                        question: 'Send a photo of any building from the entrance of your station.',
-                        note: 'Your choice of entrance; roof + both sides, top in top 1/3 of frame',
+                        title: 'Building seen from station',
+                        question: 'Stand at an entrance to your station. Send a photo of any building you can see.',
+                        note: 'You choose the entrance. Show its roof and both sides. Put the roof in the top third of the photo.',
                         icon: 'business'
                     },
                     {
                         title: '2 buildings',
                         question: 'Send a photo of 2 buildings.',
-                        note: 'Bottom and to 4 stories',
+                        note: 'Show the bottom of both buildings and up to 4 storeys.',
                         icon: 'location_city'
                     }
                 ]
             },
             {
-                subcategory: 'Streets & Paths',
+                subcategory: 'Streets and paths',
                 items: [
                     {
                         title: 'Widest street',
-                        question: 'Send a photo of the widest street.',
-                        note: 'Both sides of the street visible. Street/path visible on Google Maps.',
+                        question: 'Send a photo of the widest street you can see.',
+                        note: 'Show both sides of the street. It must be on Google Maps.',
                         icon: 'follow_the_signs'
                     },
                     {
-                        title: 'Trace nearest street/path',
-                        question: 'Send a sketch of the nearest street/path.',
-                        note: 'Intersection to intersection. Street/path visible on Google Maps',
+                        title: 'Sketch of nearest street',
+                        question: 'Send a sketch of your nearest street or path.',
+                        note: 'Draw it from one junction to the next. It must be on Google Maps.',
                         icon: 'stylus_note'
                     }
                 ]
             },
             {
-                subcategory: 'Transit',
+                subcategory: 'Transport',
                 items: [
                     {
                         title: 'Train platform',
                         question: 'Send a photo of a train platform.',
-                        note: '2m x 2m section, 3 distinct matchable elements',
+                        note: 'Show an area about 2m by 2m. Include 3 things the seekers could find and match.',
                         icon: 'train'
                     }
                 ]
             },
             {
-                subcategory: 'Outdoor Features',
+                subcategory: 'Outdoors',
                 items: [
                     {
                         title: 'Tree',
-                        question: 'Send a photo of an entire tree.',
-                        note: '',
+                        question: 'Send a photo of a whole tree.',
                         icon: 'nature'
                     },
                     {
                         title: 'Park',
                         question: 'Send a photo of a park.',
-                        note: 'No zoom, perpendicular to ground, 2m from obstruction',
+                        note: 'Hold the phone upright. Do not zoom. Stand at least 2m from anything in the way.',
                         icon: 'forest'
                     },
                     {
                         title: 'Telephone box',
-                        question: 'Send a photo of an entire telephone box.',
-                        note: '',
+                        question: 'Send a photo of a whole telephone box.',
                         icon: 'phone'
                     }
                 ]
             },
             {
-                subcategory: 'Commercial & Services',
+                subcategory: 'Shops and restaurants',
                 items: [
                     {
-                        title: 'Restaurant interior',
-                        question: 'Send a photo of a restaurant interior.',
-                        note: 'Through window from outside, no zoom',
+                        title: 'Restaurant inside',
+                        question: 'Send a photo of the inside of a restaurant.',
+                        note: 'Take it through a window from outside. Do not zoom.',
                         icon: 'restaurant'
                     },
                     {
                         title: 'Shop aisle',
                         question: 'Send a photo of an aisle in a shop.',
-                        note: 'From end of aisle shooting down, no zoom',
+                        note: 'Stand at one end and point the camera down the aisle. Do not zoom.',
                         icon: 'shopping_cart'
                     }
                 ]
@@ -569,15 +551,17 @@ export const questionsData = {
         textColor: '#0b0c0c', // Text and icon colour on the category colour (contrast 4.5:1 or more)
         icon: 'hub',
         title: 'TENTACLE',
-        description: '"Within ___ of me, which ___ are you nearest to?"',
-        badges: ['Name / Not within reach', '5 min', 'Draw 4, keep 2'],
-        answer: "Location name or 'Not within reach'",
-        reward: 'Draw 4, keep 2',
+        description: '"Of all the ___ within ___ of me, which are you closest to?"',
+        badges: ['Place name', '5 minutes', 'Draw 4, keep 2'],
+        answer: 'the name of the place, or "out of range" if you are not within that distance',
+        time: '5 minutes',
+        reward: 'Then draw 4 cards and keep 2.',
+        fill: 'The places are: [list]',
+        rules: [OUTSIDE],
         gridCols: 2,
-        note: 'Seekers should send a list of locations for the hider to choose from.',
         questions: [
             {
-                subcategory: 'Within 2 km',
+                subcategory: 'Within 2km',
                 items: [
                     {
                         title: 'Museums (2km)',
@@ -605,19 +589,14 @@ export const questionsData = {
     }
 };
 
-
-// General rules data
-const rulesData = {
-    title: 'General Rules',
-    icon: 'rule',
-    rules: [
-        {
-            text: 'Treat locations outside map boundaries as if they don\'t exist.',
-            icon: 'radio_button_unchecked'
-        },
-        {
-            text: 'Seekers can only ask one question at a time, and must wait for an answer before asking the next question.',
-            icon: 'radio_button_unchecked'
-        }
-    ]
+// Old question keys mapped to new ones, so saved games keep their asked
+// questions and history after a title changes. Format: "CATEGORY:Title".
+export const renamedQuestions = {
+    'MATCHING:Night tube status': 'MATCHING:Night Tube service',
+    'PHOTO:You (selfie)': 'PHOTO:Selfie',
+    'PHOTO:Structure with highest elevation in your sightline': 'PHOTO:Tallest structure you can see',
+    'PHOTO:Structure with highest elevation from station': 'PHOTO:Tallest structure seen from station',
+    'PHOTO:Any building visible from station': 'PHOTO:Building seen from station',
+    'PHOTO:Trace nearest street/path': 'PHOTO:Sketch of nearest street',
+    'PHOTO:Restaurant interior': 'PHOTO:Restaurant inside'
 };

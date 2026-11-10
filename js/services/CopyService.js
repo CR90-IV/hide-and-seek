@@ -18,10 +18,12 @@ export class CopyService {
    * Create a new CopyService
    * @param {StateManager} stateManager - The state manager
    * @param {Toast} toast - The toast component
+   * @param {QuestionService} questionService - The question service
    */
-  constructor(stateManager, toast) {
+  constructor(stateManager, toast, questionService) {
     this.state = stateManager;
     this.toast = toast;
+    this.questions = questionService;
   }
 
   /* ============================================
@@ -32,13 +34,12 @@ export class CopyService {
    * Handle copying a question
    * Unified handler for all question types and sources
    *
-   * @param {string} source - Source of the copy ('detail', 'overview', 'history')
-   * @param {object} questionData - { category, title, question, answer, note, reward }
+   * @param {string} source - Source of the copy ('detail', 'overview')
+   * @param {object} ref - { category, title }
    * @param {object} options - { allowToggle: boolean }
    * @returns {Promise<void>}
    */
-  async handleCopy(source, questionData, options = {}) {
-    const { category, title, question, answer, note, reward } = questionData;
+  async handleCopy(source, { category, title }, options = {}) {
     const key = `${category}:${title}`;
     const { allowToggle = true } = options;
 
@@ -49,27 +50,16 @@ export class CopyService {
     }
 
     try {
-      // Build message
-      const message = MessageFormatter.formatWhatsAppMessage(
-        category,
-        title,
-        question,
-        answer,
-        note,
-        reward
-      );
+      const q = this.#getQuestion(category, title);
+      const message = MessageFormatter.formatQuestion(q);
 
-      // Execute copy strategy
       const strategy = this.state.getWhatsAppMode();
       await this.#executeStrategy(strategy, message);
 
-      // Update state (ONE place instead of THREE)
-      this.state.markQuestionAsUsed(key, { category, title, question });
+      this.state.markQuestionAsUsed(key, { category, title, question: q.question });
 
-      // Show feedback
-      const toastMessage = strategy === 'deeplink' ? 'Opening WhatsApp' : 'Copied to clipboard';
-      const showUndo = strategy !== 'deeplink';
-      this.toast.show(toastMessage, showUndo);
+      const action = strategy === 'deeplink' ? 'Opening WhatsApp' : 'Copied to clipboard';
+      this.toast.show(this.#toastText(action, message), strategy !== 'deeplink');
 
     } catch (error) {
       console.error('CopyService: Failed to copy question:', error);
@@ -78,46 +68,55 @@ export class CopyService {
   }
 
   /**
-   * Handle copying thermometer start message
+   * Handle copying the thermometer start message
    * (Does NOT mark question as used)
    *
-   * @param {string} distance - The distance (e.g., "3 miles")
+   * @param {object} ref - { category, title }
    * @returns {Promise<void>}
    */
-  async copyThermometerStart(distance) {
+  async copyThermometerStart({ category, title }) {
     try {
-      const message = MessageFormatter.formatThermometerStart(distance);
+      const message = MessageFormatter.formatThermometerStart(this.#getQuestion(category, title));
 
       // Always use clipboard for start messages (never deeplink)
       await this.#copyToClipboard(message);
 
-      this.toast.show('Copied to clipboard', false);
+      this.toast.show(this.#toastText('Copied to clipboard', message), false);
 
     } catch (error) {
       console.error('CopyService: Failed to copy thermometer start:', error);
-      this.toast.show('Could not copy the question. Try again.', false, 'error');
+      this.toast.show('Could not copy the message. Try again.', false, 'error');
     }
   }
 
   /**
-   * Handle copying from history
-   * @param {object} historyEntry - The history entry
-   * @param {object} questionData - Full question data from QuestionService
+   * Handle copying from history. Uses the current wording of the question.
+   * @param {object} ref - { category, title }
    * @returns {Promise<void>}
    */
-  async copyFromHistory(historyEntry, questionData) {
+  async copyFromHistory({ category, title }) {
     try {
-      const message = MessageFormatter.formatFromHistory(historyEntry, questionData);
+      const message = MessageFormatter.formatQuestion(this.#getQuestion(category, title));
 
       // Always use clipboard for history (never mark as used again)
       await this.#copyToClipboard(message);
 
-      this.toast.show('Copied to clipboard', false);
+      this.toast.show(this.#toastText('Copied to clipboard', message), false);
 
     } catch (error) {
       console.error('CopyService: Failed to copy from history:', error);
       this.toast.show('Could not copy the question. Try again.', false, 'error');
     }
+  }
+
+  #getQuestion(category, title) {
+    const q = this.questions.getQuestion(category, title);
+    if (!q) throw new Error(`Question not found: ${category}:${title}`);
+    return q;
+  }
+
+  #toastText(action, message) {
+    return message.includes('[') ? `${action}. Fill in the [gaps] before you send.` : action;
   }
 
   /* ============================================

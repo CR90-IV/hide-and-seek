@@ -87,7 +87,7 @@ export class DetailRenderer {
     // Thermometer START buttons
     this.#events.on('.thermometer-btn.start-btn', 'click', (event, btn) => {
       event.stopPropagation();
-      this.#copyService.copyThermometerStart(btn.dataset.distance);
+      this.#copyService.copyThermometerStart(this.#extractQuestionData(btn.closest('.app-question')));
     });
   }
 
@@ -134,7 +134,7 @@ export class DetailRenderer {
         <p class="govuk-body-l app-band__description">${categoryData.description}</p>
         <div class="app-band__tags">${tagsHTML}</div>
       </div>
-      ${categoryData.note ? `<div class="govuk-inset-text">${categoryData.note}</div>` : ''}
+      ${this.#categoryNoteHTML(categoryData)}
     `;
 
     categoryData.questions.forEach(group => {
@@ -166,10 +166,6 @@ export class DetailRenderer {
   #setRowData(row, categoryData, item) {
     row.dataset.category = categoryData.title;
     row.dataset.title = item.title;
-    row.dataset.question = item.question;
-    row.dataset.answer = item.answer || categoryData.answer;
-    row.dataset.note = item.note || '';
-    row.dataset.reward = categoryData.reward;
   }
 
   #createQuestionRow(categoryData, item) {
@@ -178,7 +174,7 @@ export class DetailRenderer {
     row.className = 'govuk-task-list__item govuk-task-list__item--with-link app-question';
     this.#setRowData(row, categoryData, item);
 
-    const hint = item.note || item.subtitle || '';
+    const hint = [item.fill, item.note].filter(Boolean).join('<br>');
 
     row.innerHTML = `
       ${iconBoxHTML(item.icon)}
@@ -208,7 +204,7 @@ export class DetailRenderer {
         ${item.note ? `<div class="govuk-task-list__hint app-question__note">${item.note}</div>` : ''}
         <div class="app-thermometer__actions">
           <button type="button" class="govuk-button govuk-button--secondary thermometer-btn start-btn"
-                  data-distance="${item.title}">
+                 >
             Start<span class="govuk-visually-hidden"> ${item.title}</span>
           </button>
           <button type="button" class="govuk-button govuk-button--secondary thermometer-btn end-btn"
@@ -223,6 +219,22 @@ export class DetailRenderer {
     return row;
   }
 
+  /**
+   * Rules for the hider (also in every message) and help for the seekers
+   */
+  #categoryNoteHTML(categoryData) {
+    const rules = categoryData.rules || [];
+    const parts = [];
+    if (categoryData.seekerNote) {
+      parts.push(`<p class="govuk-body">${categoryData.seekerNote}</p>`);
+    }
+    if (rules.length) {
+      parts.push(`<p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-1">Rules for the hider</p>`);
+      parts.push(`<ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">${rules.map(r => `<li>${r}</li>`).join('')}</ul>`);
+    }
+    return parts.length ? `<div class="govuk-inset-text">${parts.join('')}</div>` : '';
+  }
+
   #createRulesSection() {
     const section = document.createElement('section');
     section.className = 'app-category';
@@ -230,10 +242,10 @@ export class DetailRenderer {
     section.innerHTML = `
       <h2 class="govuk-heading-l">General rules</h2>
       <ul class="govuk-list govuk-list--bullet">
-        <li>Ask questions one at a time.</li>
-        <li>Hiders must answer truthfully.</li>
-        <li>The hider has 5 minutes to answer, unless the question says a different time.</li>
-        <li>The hider gets the card reward after each question.</li>
+        <li>Ask one question at a time. Wait for the answer before you ask the next one.</li>
+        <li>The hider must tell the truth.</li>
+        <li>Ignore places outside the game area.</li>
+        <li>After each answer, the hider draws cards. Each question says how many.</li>
       </ul>
     `;
     return section;
@@ -304,7 +316,7 @@ export class DetailRenderer {
      ============================================ */
 
   #extractQuestionData(element) {
-    const { category, title, question, answer, note, reward } = element.dataset;
-    return { category, title, question, answer, note, reward };
+    const { category, title } = element.dataset;
+    return { category, title };
   }
 }

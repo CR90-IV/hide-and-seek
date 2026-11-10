@@ -34,9 +34,14 @@ export class StateManager {
    * Create a new StateManager
    * @param {StorageService} storageService - The storage service to use
    */
-  constructor(storageService) {
+  /**
+   * @param {StorageService} storageService - The storage service
+   * @param {object} renamedQuestions - Old question keys mapped to new keys
+   */
+  constructor(storageService, renamedQuestions = {}) {
     this.storage = storageService;
     this.#loadState();
+    this.#migrateRenamedQuestions(renamedQuestions);
   }
 
   /* ============================================
@@ -298,6 +303,34 @@ export class StateManager {
     this.#state.whatsappMode = this.storage.get('whatsappMode', 'clipboard');
 
     console.log(`StateManager: Loaded ${this.#state.usedQuestions.size} used questions, ${this.#state.questionHistory.length} history entries`);
+  }
+
+  /**
+   * Update saved keys for questions whose title changed
+   * @private
+   */
+  #migrateRenamedQuestions(renamed) {
+    let changed = false;
+
+    for (const [oldKey, newKey] of Object.entries(renamed)) {
+      if (this.#state.usedQuestions.delete(oldKey)) {
+        this.#state.usedQuestions.add(newKey);
+        changed = true;
+      }
+    }
+
+    for (const entry of this.#state.questionHistory) {
+      const newKey = renamed[`${entry.category}:${entry.title}`];
+      if (newKey) {
+        entry.title = newKey.slice(newKey.indexOf(':') + 1);
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      this.#saveUsedQuestions();
+      this.#saveHistory();
+    }
   }
 
   /**
