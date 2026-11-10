@@ -2,7 +2,7 @@
  * ViewManager - Switches between the Questions, Overview, History and Settings views
  *
  * The URL hash selects the view (#questions, #overview, #history, #settings),
- * so the GOV.UK service navigation links and the browser back button work.
+ * so the header navigation links and the browser back button work.
  */
 const HASH_TO_VIEW = {
   questions: 'detail',
@@ -69,7 +69,9 @@ export class ViewManager {
     }
 
     // Search applies to the Questions and Overview views only
-    this.#searchContainer?.classList.toggle('hidden', view !== 'detail' && view !== 'overview');
+    const hasSearch = view === 'detail' || view === 'overview';
+    this.#searchContainer?.classList.toggle('hidden', !hasSearch);
+    if (hasSearch) this.#placeSearch(view);
 
     this.#updateNavigation(view);
     document.title = `${VIEW_TITLES[view]} – Hide and seek`;
@@ -98,20 +100,26 @@ export class ViewManager {
   }
 
   #updateNavigation(activeView) {
-    document.querySelectorAll('.govuk-service-navigation__item[data-view]').forEach(item => {
-      const link = item.querySelector('.govuk-service-navigation__link');
+    document.querySelectorAll('.app-nav__item[data-view]').forEach(item => {
+      const link = item.querySelector('.app-nav__link');
       const isActive = item.dataset.view === activeView;
-      item.classList.toggle('govuk-service-navigation__item--active', isActive);
-
-      // Active items use a <strong> fallback inside the link
-      const label = link.textContent.trim();
+      item.classList.toggle('app-nav__item--active', isActive);
       if (isActive) {
         link.setAttribute('aria-current', 'page');
-        link.innerHTML = `<strong class="govuk-service-navigation__active-fallback">${label}</strong>`;
       } else {
         link.removeAttribute('aria-current');
-        link.textContent = label;
       }
     });
+  }
+
+  /**
+   * Put the search box after the heading and intro of the view,
+   * so each page starts with its heading
+   */
+  #placeSearch(view) {
+    const intro = this.#views[view].element.querySelector('.app-view__intro');
+    if (intro && this.#searchContainer && intro.nextElementSibling !== this.#searchContainer) {
+      intro.after(this.#searchContainer);
+    }
   }
 }

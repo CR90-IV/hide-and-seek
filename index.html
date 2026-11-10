@@ -6,54 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Questions – Hide and seek</title>
 
-    <!-- GOV.UK Frontend 6.6.0, compiled with Arial (GDS Transport is for GOV.UK only) -->
+    <!-- GOV.UK Frontend 6.6.0, compiled with Inter (GDS Transport is for GOV.UK only) -->
     <link rel="stylesheet" href="vendor/govuk-frontend/govuk-frontend.min.css">
     <link rel="stylesheet" href="styles.css">
 
     <!-- PWA Support -->
     <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#0b0c0c">
+    <meta name="theme-color" content="#ffffff">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Hider">
 </head>
 
 <body class="govuk-template__body">
     <a href="#main-content" class="govuk-skip-link">Skip to main content</a>
 
-    <!-- Header -->
-    <header class="govuk-generic-header" role="banner">
-        <div class="govuk-generic-header__container govuk-width-container">
-            <div class="govuk-generic-header__logo">
-                <a href="#questions" class="govuk-generic-header__homepage-link">Hide and seek</a>
-            </div>
+    <!-- Header: service name and navigation in one bar -->
+    <header class="app-header">
+        <div class="govuk-width-container app-header__inner">
+            <a href="#questions" class="app-header__brand">
+                <span class="app-header__mark" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                </span>
+                Hide and seek
+            </a>
+            <nav aria-label="Menu" class="app-nav">
+                <ul class="app-nav__list">
+                    <li class="app-nav__item" data-view="detail"><a class="app-nav__link" href="#questions">Questions</a></li>
+                    <li class="app-nav__item" data-view="overview"><a class="app-nav__link" href="#overview">Overview</a></li>
+                    <li class="app-nav__item" data-view="history"><a class="app-nav__link" href="#history">History</a></li>
+                    <li class="app-nav__item" data-view="settings"><a class="app-nav__link" href="#settings">Settings</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
-
-    <!-- Service navigation -->
-    <section aria-label="Service information" class="govuk-service-navigation app-service-navigation">
-        <div class="govuk-width-container">
-            <div class="govuk-service-navigation__container">
-                <nav aria-label="Menu" class="govuk-service-navigation__wrapper">
-                    <ul class="govuk-service-navigation__list" id="navigation">
-                        <li class="govuk-service-navigation__item" data-view="detail">
-                            <a class="govuk-service-navigation__link" href="#questions">Questions</a>
-                        </li>
-                        <li class="govuk-service-navigation__item" data-view="overview">
-                            <a class="govuk-service-navigation__link" href="#overview">Overview</a>
-                        </li>
-                        <li class="govuk-service-navigation__item" data-view="history">
-                            <a class="govuk-service-navigation__link" href="#history">History</a>
-                        </li>
-                        <li class="govuk-service-navigation__item" data-view="settings">
-                            <a class="govuk-service-navigation__link" href="#settings">Settings</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </section>
 
     <div class="govuk-width-container">
         <main class="govuk-main-wrapper" id="main-content">
@@ -74,7 +61,7 @@
             <!-- Questions view -->
             <div id="normal-view" class="app-view">
                 <h1 class="govuk-heading-xl">Questions</h1>
-                <p class="govuk-body-l">Select a question to copy it. The question is then marked as asked.</p>
+                <p class="govuk-body-l app-view__intro">Select a question to copy it. The question is then marked as asked.</p>
 
                 <nav id="quick-jump" class="app-contents" aria-label="Contents">
                     <!-- Contents list is rendered here -->
@@ -88,7 +75,7 @@
             <!-- Overview view -->
             <div id="overview-view" class="app-view hidden">
                 <h1 class="govuk-heading-xl">Overview</h1>
-                <p class="govuk-body">All questions on one page. Select a question to copy it, or select it again to mark it as not asked.</p>
+                <p class="govuk-body app-view__intro">All questions on one page. Select a question to copy it, or select it again to mark it as not asked.</p>
                 <div class="overview-container">
                     <!-- Overview is rendered here -->
                 </div>

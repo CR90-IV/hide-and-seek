@@ -11,27 +11,150 @@
 /* Leave space at the bottom so the copy banner does not cover content */
 .govuk-template__body {
     padding-bottom: env(safe-area-inset-bottom);
+    font-family: "Inter", arial, sans-serif;
 }
 
 /* ============================================
-   SERVICE NAVIGATION
-   Keep the 4 items in one row on small screens (no "Menu" toggle)
+   FONT (Inter, self-hosted so the app works offline; see vendor/inter)
    ============================================ */
-.app-service-navigation .govuk-service-navigation__list {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: 20px;
-    margin-bottom: 0;
+@font-face {
+    font-family: "Inter";
+    font-style: normal;
+    font-weight: 400 700;
+    font-display: swap;
+    src: url("vendor/inter/inter-latin-variable.woff2") format("woff2");
 }
 
-.app-service-navigation .govuk-service-navigation__item {
+/* ============================================
+   HEADER
+   One white bar: service name on the left, navigation on the right.
+   On small screens the navigation is a row of 4 equal tabs.
+   ============================================ */
+.app-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #cecece;
+    font-family: "Inter", arial, sans-serif;
+}
+
+.app-header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: space-between;
+}
+
+.app-header__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 0 10px;
+    color: #0b0c0c;
+    font-size: 1.1875rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+}
+
+.app-header__brand:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+}
+
+.app-header__brand:focus {
+    outline: 3px solid transparent;
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
+    text-decoration: none;
+}
+
+/* Small mark made of the 6 category colours */
+.app-header__mark {
+    display: grid;
+    grid-template-columns: repeat(3, 8px);
+    grid-template-rows: repeat(2, 8px);
+    gap: 2px;
+}
+
+.app-header__mark span:nth-child(1) { background-color: #232F41; }
+.app-header__mark span:nth-child(2) { background-color: #4DA266; }
+.app-header__mark span:nth-child(3) { background-color: #F6793C; }
+.app-header__mark span:nth-child(4) { background-color: #FFBF40; }
+.app-header__mark span:nth-child(5) { background-color: #81B5CD; }
+.app-header__mark span:nth-child(6) { background-color: #9372AE; }
+
+.app-nav {
+    width: 100%;
+}
+
+.app-nav__list {
+    display: flex;
     margin: 0;
-    padding: 10px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.app-nav__item {
+    flex: 1 1 0;
+    text-align: center;
+}
+
+.app-nav__link {
+    display: block;
+    padding: 10px 4px 9px;
+    border-bottom: 4px solid transparent;
+    color: var(--govuk-link-colour, #1a65a6);
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.app-nav__link:hover {
+    color: var(--govuk-link-hover-colour, #0f385c);
+    border-bottom-color: #cecece;
+}
+
+.app-nav__item--active .app-nav__link {
+    color: #0b0c0c;
+    font-weight: 700;
+    border-bottom-color: var(--govuk-brand-colour, #1d70b8);
+}
+
+.app-nav__link:focus {
+    outline: 3px solid transparent;
+    color: var(--govuk-focus-text-colour, #0b0c0c);
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    box-shadow: inset 0 -4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
 @media (min-width: 40.0625em) {
-    .app-service-navigation .govuk-service-navigation__item {
-        padding: 15px 0;
+    .app-header__inner {
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+
+    .app-header__brand {
+        padding: 0;
+    }
+
+    .app-nav {
+        width: auto;
+        align-self: stretch;
+    }
+
+    .app-nav__list {
+        height: 100%;
+        gap: 25px;
+    }
+
+    .app-nav__item {
+        flex: 0 0 auto;
+    }
+
+    .app-nav__link {
+        height: 100%;
+        box-sizing: border-box;
+        padding: 20px 0 16px;
     }
 }
 
@@ -170,7 +293,7 @@
 
 .app-band__progress {
     margin-left: auto;
-    font-family: arial, sans-serif;
+    font-family: "Inter", arial, sans-serif;
     font-weight: 700;
     font-size: 1rem;
     white-space: nowrap;
