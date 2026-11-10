@@ -1,10 +1,11 @@
 import { sentenceCase } from '../../utils/dom.js';
 
 /**
- * QuickJump - "Contents" list of links to each category section
+ * QuickJump - Sticky row of category links ("chips") for the Questions view
  *
- * Follows the GOV.UK contents list pattern. Each link goes to the
- * section with id "category-<key>", rendered by DetailRenderer.
+ * On a phone the row scrolls sideways and stays at the top of the screen,
+ * so you can jump between categories from anywhere in the long list.
+ * Each link goes to the section with id "category-<key>" (DetailRenderer).
  */
 export class QuickJump {
   #element;
@@ -29,15 +30,20 @@ export class QuickJump {
 
   render() {
     const links = Object.entries(this.#questionsData)
-      .map(([key, data]) => `<li><a class="govuk-link" href="#category-${key}">${sentenceCase(data.title)}</a></li>`)
+      .map(([key, data]) => `
+        <li class="app-jump__item">
+          <a class="app-jump__link" href="#category-${key}"
+             style="--app-category-colour: ${data.color}">
+            <span class="app-jump__swatch" aria-hidden="true"></span>${sentenceCase(data.title)}
+          </a>
+        </li>`)
       .join('');
 
     this.#element.innerHTML = `
-      <h2 class="govuk-heading-s govuk-!-margin-bottom-2">Contents</h2>
-      <ol class="govuk-body app-contents__list">
+      <ul class="app-jump__list">
         ${links}
-        <li><a class="govuk-link" href="#category-rules">General rules</a></li>
-      </ol>
+        <li class="app-jump__item"><a class="app-jump__link" href="#category-rules">Rules</a></li>
+      </ul>
     `;
   }
 

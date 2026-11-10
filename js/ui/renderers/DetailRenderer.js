@@ -9,7 +9,8 @@ import { sentenceCase, setCategoryColours, iconBoxHTML, updateProgress } from '.
  *   question pattern and tags (answer type, time and reward)
  * - inset text for the category note
  * - a task list where each row has an icon in the category colour,
- *   the question (button) and an "Asked" status. Asked rows are grey.
+ *   the question title (button), the full question text in small type,
+ *   any note, and an "Asked" status. Asked rows are grey.
  *
  * Event delegation: one listener on the container handles all rows and buttons.
  */
@@ -183,8 +184,9 @@ export class DetailRenderer {
       ${iconBoxHTML(item.icon)}
       <div class="govuk-task-list__name-and-hint">
         <button type="button" class="govuk-task-list__link app-question__button"
-                aria-describedby="${hint ? `${id}-hint ` : ''}${id}-status">${item.title}</button>
-        ${hint ? `<div id="${id}-hint" class="govuk-task-list__hint">${hint}</div>` : ''}
+                aria-describedby="${id}-question ${hint ? `${id}-hint ` : ''}${id}-status">${item.title}</button>
+        <p id="${id}-question" class="app-question__text">${item.question}</p>
+        ${hint ? `<div id="${id}-hint" class="govuk-task-list__hint app-question__note">${hint}</div>` : ''}
       </div>
       <div class="govuk-task-list__status" id="${id}-status"></div>
     `;
@@ -202,7 +204,8 @@ export class DetailRenderer {
       ${iconBoxHTML(item.icon)}
       <div class="govuk-task-list__name-and-hint">
         <p class="govuk-body govuk-!-font-weight-bold govuk-!-margin-bottom-0 app-thermometer__title">${item.title}</p>
-        ${item.note ? `<div class="govuk-task-list__hint">${item.note}</div>` : ''}
+        <p class="app-question__text">${item.question}</p>
+        ${item.note ? `<div class="govuk-task-list__hint app-question__note">${item.note}</div>` : ''}
         <div class="app-thermometer__actions">
           <button type="button" class="govuk-button govuk-button--secondary thermometer-btn start-btn"
                   data-distance="${item.title}">

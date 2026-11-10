@@ -33,10 +33,10 @@
             </a>
             <nav aria-label="Menu" class="app-nav">
                 <ul class="app-nav__list">
-                    <li class="app-nav__item" data-view="detail"><a class="app-nav__link" href="#questions">Questions</a></li>
-                    <li class="app-nav__item" data-view="overview"><a class="app-nav__link" href="#overview">Overview</a></li>
-                    <li class="app-nav__item" data-view="history"><a class="app-nav__link" href="#history">History</a></li>
-                    <li class="app-nav__item" data-view="settings"><a class="app-nav__link" href="#settings">Settings</a></li>
+                    <li class="app-nav__item" data-view="detail"><a class="app-nav__link" href="#questions"><span class="app-icon app-nav__icon" aria-hidden="true">view_list</span><span class="app-nav__label">Questions</span></a></li>
+                    <li class="app-nav__item" data-view="overview"><a class="app-nav__link" href="#overview"><span class="app-icon app-nav__icon" aria-hidden="true">grid_view</span><span class="app-nav__label">Overview</span></a></li>
+                    <li class="app-nav__item" data-view="history"><a class="app-nav__link" href="#history"><span class="app-icon app-nav__icon" aria-hidden="true">history</span><span class="app-nav__label">History</span></a></li>
+                    <li class="app-nav__item" data-view="settings"><a class="app-nav__link" href="#settings"><span class="app-icon app-nav__icon" aria-hidden="true">settings</span><span class="app-nav__label">Settings</span></a></li>
                 </ul>
             </nav>
         </div>
@@ -60,10 +60,10 @@
 
             <!-- Questions view -->
             <div id="normal-view" class="app-view">
-                <h1 class="govuk-heading-xl">Questions</h1>
-                <p class="govuk-body-l app-view__intro">Select a question to copy it. The question is then marked as asked.</p>
+                <h1 class="govuk-heading-l app-view__heading">Questions</h1>
+                <p class="govuk-body app-view__intro">Select a question to copy it. It is then marked as asked.</p>
 
-                <nav id="quick-jump" class="app-contents" aria-label="Contents">
+                <nav id="quick-jump" class="app-jump" aria-label="Jump to a category">
                     <!-- Contents list is rendered here -->
                 </nav>
 
@@ -74,8 +74,8 @@
 
             <!-- Overview view -->
             <div id="overview-view" class="app-view hidden">
-                <h1 class="govuk-heading-xl">Overview</h1>
-                <p class="govuk-body app-view__intro">All questions on one page. Select a question to copy it, or select it again to mark it as not asked.</p>
+                <h1 class="govuk-heading-l app-view__heading">Overview</h1>
+                <p class="govuk-body app-view__intro">Select a question to copy it. Select it again to mark it as not asked.</p>
                 <div class="overview-container">
                     <!-- Overview is rendered here -->
                 </div>
@@ -83,7 +83,7 @@
 
             <!-- History view -->
             <div id="history-view" class="app-view hidden">
-                <h1 class="govuk-heading-xl">History</h1>
+                <h1 class="govuk-heading-l app-view__heading">History</h1>
                 <p class="govuk-body">Questions you copied, most recent first.</p>
                 <div id="history-list" class="history-list">
                     <!-- History is rendered here -->
@@ -95,7 +95,7 @@
 
             <!-- Settings view -->
             <div id="settings-view" class="app-view hidden">
-                <h1 class="govuk-heading-xl">Settings</h1>
+                <h1 class="govuk-heading-l app-view__heading">Settings</h1>
 
                 <div class="govuk-form-group">
                     <fieldset class="govuk-fieldset">

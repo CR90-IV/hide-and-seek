@@ -10,7 +10,6 @@
 
 /* Leave space at the bottom so the copy banner does not cover content */
 .govuk-template__body {
-    padding-bottom: env(safe-area-inset-bottom);
     font-family: "Inter", arial, sans-serif;
 }
 
@@ -26,9 +25,11 @@
 }
 
 /* ============================================
-   HEADER
-   One white bar: service name on the left, navigation on the right.
-   On small screens the navigation is a row of 4 equal tabs.
+   HEADER AND NAVIGATION
+   Mobile first: a slim header with the service name, and the
+   navigation as a tab bar fixed to the bottom of the screen (easy to
+   reach with a thumb). From tablet width: one bar with the service
+   name on the left and the navigation on the right.
    ============================================ */
 .app-header {
     background-color: #ffffff;
@@ -38,8 +39,7 @@
 
 .app-header__inner {
     display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
+    align-items: center;
     justify-content: space-between;
 }
 
@@ -47,9 +47,9 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 14px 0 10px;
+    padding: 12px 0;
     color: #0b0c0c;
-    font-size: 1.1875rem;
+    font-size: 1.125rem;
     font-weight: 700;
     letter-spacing: -0.01em;
     text-decoration: none;
@@ -60,7 +60,7 @@
     text-underline-offset: 0.15em;
 }
 
-.app-header__brand:focus {
+.app-header__brand:focus-visible {
     outline: 3px solid transparent;
     color: var(--govuk-focus-text-colour, #0b0c0c);
     background-color: var(--govuk-focus-colour, #ffdd00);
@@ -83,8 +83,16 @@
 .app-header__mark span:nth-child(5) { background-color: #81B5CD; }
 .app-header__mark span:nth-child(6) { background-color: #9372AE; }
 
+/* Bottom tab bar (phones) */
 .app-nav {
-    width: 100%;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    background-color: #ffffff;
+    border-top: 1px solid #cecece;
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .app-nav__list {
@@ -96,50 +104,58 @@
 
 .app-nav__item {
     flex: 1 1 0;
-    text-align: center;
 }
 
 .app-nav__link {
-    display: block;
-    padding: 10px 4px 9px;
-    border-bottom: 4px solid transparent;
-    color: var(--govuk-link-colour, #1a65a6);
-    font-size: 1rem;
-    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-height: 56px;
+    box-sizing: border-box;
+    padding: 6px 2px 6px;
+    border-top: 3px solid transparent;
+    color: var(--govuk-secondary-text-colour, #484949);
+    font-size: 0.75rem;
+    font-weight: 600;
     text-decoration: none;
-}
-
-.app-nav__link:hover {
-    color: var(--govuk-link-hover-colour, #0f385c);
-    border-bottom-color: #cecece;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .app-nav__item--active .app-nav__link {
-    color: #0b0c0c;
-    font-weight: 700;
-    border-bottom-color: var(--govuk-brand-colour, #1d70b8);
+    color: var(--govuk-brand-colour, #1d70b8);
+    border-top-color: var(--govuk-brand-colour, #1d70b8);
 }
 
-.app-nav__link:focus {
+.app-nav__link:focus-visible {
     outline: 3px solid transparent;
     color: var(--govuk-focus-text-colour, #0b0c0c);
     background-color: var(--govuk-focus-colour, #ffdd00);
     box-shadow: inset 0 -4px var(--govuk-focus-text-colour, #0b0c0c);
 }
 
+/* Room for the tab bar at the bottom of the page */
+.govuk-template__body {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+}
+
+/* Top navigation (tablet and desktop) */
 @media (min-width: 40.0625em) {
-    .app-header__inner {
-        flex-wrap: nowrap;
-        align-items: center;
+    .govuk-template__body {
+        padding-bottom: 0;
     }
 
     .app-header__brand {
         padding: 0;
+        font-size: 1.1875rem;
     }
 
     .app-nav {
-        width: auto;
+        position: static;
         align-self: stretch;
+        border-top: 0;
+        padding-bottom: 0;
+        background: none;
     }
 
     .app-nav__list {
@@ -151,11 +167,58 @@
         flex: 0 0 auto;
     }
 
-    .app-nav__link {
-        height: 100%;
-        box-sizing: border-box;
-        padding: 20px 0 16px;
+    .app-nav .app-nav__icon {
+        display: none;
     }
+
+    .app-nav__link {
+        display: block;
+        height: 100%;
+        min-height: 0;
+        padding: 20px 0 16px;
+        border-top: 0;
+        border-bottom: 4px solid transparent;
+        color: var(--govuk-link-colour, #1a65a6);
+        font-size: 1rem;
+        font-weight: 500;
+    }
+
+    .app-nav__link:hover {
+        color: var(--govuk-link-hover-colour, #0f385c);
+        border-bottom-color: #cecece;
+    }
+
+    .app-nav__item--active .app-nav__link {
+        color: #0b0c0c;
+        font-weight: 700;
+        border-bottom-color: var(--govuk-brand-colour, #1d70b8);
+    }
+}
+
+/* ============================================
+   PAGE HEADINGS (smaller on phones, so content starts higher)
+   ============================================ */
+.app-view__heading {
+    margin-bottom: 10px;
+}
+
+.app-view__intro {
+    margin-bottom: 15px;
+}
+
+@media (max-width: 40.0525em) {
+    .govuk-main-wrapper {
+        padding-top: 15px;
+    }
+
+    .app-view__heading {
+        font-size: 1.625rem;
+    }
+}
+
+/* Remove the 300 ms tap delay on phones */
+a, button, input, label {
+    touch-action: manipulation;
 }
 
 /* ============================================
@@ -179,30 +242,77 @@
 }
 
 /* ============================================
-   CONTENTS LIST (replaces the quick jump dots)
+   CATEGORY JUMP ROW (Questions view)
+   Sticks to the top of the screen. On phones it scrolls sideways.
    ============================================ */
-.app-contents {
-    margin-bottom: 40px;
+.app-jump {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    margin: 0 -15px 20px;
+    padding: 8px 15px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #cecece;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
 }
 
-.app-contents__list {
-    list-style: none;
-    padding: 0;
+.app-jump::-webkit-scrollbar {
+    display: none;
+}
+
+.app-jump__list {
+    display: flex;
+    gap: 8px;
     margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
-.app-contents__list li {
-    position: relative;
-    padding-left: 25px;
-    margin-bottom: 5px;
+.app-jump__item {
+    flex-shrink: 0;
 }
 
-.app-contents__list li::before {
-    content: "—";
-    position: absolute;
-    left: 0;
-    width: 20px;
-    overflow: hidden;
+.app-jump__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    box-sizing: border-box;
+    padding: 6px 12px;
+    border: 1px solid #b1b4b6;
+    background-color: #ffffff;
+    color: #0b0c0c;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.app-jump__link:hover {
+    border-color: #0b0c0c;
+}
+
+.app-jump__link:focus-visible {
+    outline: 3px solid transparent;
+    background-color: var(--govuk-focus-colour, #ffdd00);
+    box-shadow: inset 0 -4px var(--govuk-focus-text-colour, #0b0c0c);
+}
+
+.app-jump__swatch {
+    width: 12px;
+    height: 12px;
+    background-color: var(--app-category-colour, #0b0c0c);
+}
+
+@media (min-width: 40.0625em) {
+    .app-jump {
+        margin-left: 0;
+        margin-right: 0;
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 
 /* ============================================
@@ -251,8 +361,8 @@
    4.5:1 contrast or more on each colour.
    ============================================ */
 .app-category {
-    margin-bottom: 50px;
-    scroll-margin-top: 15px;
+    margin-bottom: 40px;
+    scroll-margin-top: 64px; /* below the sticky jump row */
 }
 
 .app-band {
@@ -315,6 +425,41 @@
     color: #0b0c0c;
 }
 
+@media (max-width: 40.0525em) {
+    .app-band {
+        padding: 15px;
+    }
+
+    .app-band__heading.govuk-heading-l {
+        font-size: 1.5rem;
+    }
+
+    .app-band__title-row .app-icon {
+        font-size: 28px;
+    }
+
+    .app-band__description.govuk-body-l {
+        font-size: 1rem;
+        margin: 8px 0 10px;
+    }
+
+    .app-band__tags .govuk-tag {
+        font-size: 0.8125rem;
+    }
+
+    .app-category .govuk-inset-text {
+        font-size: 0.9375rem;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .app-category h3.govuk-heading-m {
+        font-size: 1.125rem;
+        margin-top: 20px;
+        margin-bottom: 5px;
+    }
+}
+
 /* ============================================
    QUESTION ROWS (task list with icon and button)
    ============================================ */
@@ -353,12 +498,27 @@
     text-decoration-thickness: max(3px, .1875rem, .12em);
 }
 
-.app-question__button:focus {
+.app-question__button:focus-visible {
     outline: 3px solid transparent;
     color: var(--govuk-focus-text-colour, #0b0c0c);
     background-color: var(--govuk-focus-colour, #ffdd00);
     box-shadow: 0 -2px var(--govuk-focus-colour, #ffdd00), 0 4px var(--govuk-focus-text-colour, #0b0c0c);
     text-decoration: none;
+}
+
+/* Full question text, in small type under the title */
+.app-question__text {
+    margin: 4px 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.35;
+    color: #0b0c0c;
+}
+
+/* Note (rules for the question): smaller and grey */
+.app-question .app-question__note {
+    margin: 4px 0 0;
+    font-size: 0.875rem;
+    line-height: 1.35;
 }
 
 /* Links inside a hint sit above the full-row click area */
@@ -386,8 +546,33 @@
     text-decoration-color: #b1b4b6;
 }
 
-.app-question--used .govuk-task-list__hint {
+.app-question--used .govuk-task-list__hint,
+.app-question--used .app-question__text {
     color: #6f7071;
+}
+
+/* Phones: tighter rows, slightly smaller title */
+@media (max-width: 40.0525em) {
+    .app-question.govuk-task-list__item {
+        gap: 12px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .app-question__button,
+    .app-thermometer__title.govuk-body {
+        font-size: 1.0625rem;
+        font-weight: 600;
+    }
+
+    .app-question .govuk-task-list__name-and-hint,
+    .app-question .govuk-task-list__status {
+        padding-top: 2px;
+    }
+
+    .app-question .govuk-tag {
+        font-size: 0.8125rem;
+    }
 }
 
 /* Thermometer rows: title, then Start and End buttons */
@@ -460,7 +645,7 @@
     color: #6f7071;
 }
 
-.app-overview-card--used.govuk-button:focus:not(:active):not(:hover) {
+.app-overview-card--used.govuk-button:focus-visible:not(:active):not(:hover) {
     background-color: var(--govuk-focus-colour, #ffdd00);
     color: var(--govuk-focus-text-colour, #0b0c0c);
 }
@@ -499,7 +684,7 @@
     position: fixed;
     left: 15px;
     right: 15px;
-    bottom: calc(15px + env(safe-area-inset-bottom));
+    bottom: calc(72px + env(safe-area-inset-bottom)); /* above the tab bar */
     max-width: 640px;
     margin: 0 auto;
     z-index: 100;
@@ -527,7 +712,55 @@
     flex-shrink: 0;
 }
 
+@media (min-width: 40.0625em) {
+    .app-toast {
+        bottom: calc(15px + env(safe-area-inset-bottom));
+    }
+}
+
+@media (max-width: 40.0525em) {
+    .app-toast__content {
+        padding: 10px 12px;
+    }
+
+    .app-toast__text.govuk-notification-banner__heading {
+        font-size: 1rem;
+    }
+}
+
 /* Space so the copy banner cannot cover the last item on the page */
 .govuk-main-wrapper {
-    padding-bottom: 120px;
+    padding-bottom: 100px;
+}
+
+/* ============================================
+   TOUCH: show the yellow focus style for keyboard use only.
+   After a tap, buttons go back to their normal look.
+   ============================================ */
+.govuk-button:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.govuk-button--secondary:focus:not(:focus-visible):not(:active) {
+    background-color: #f3f3f3;
+    box-shadow: 0 2px 0 #858686;
+    color: #0b0c0c;
+}
+
+.govuk-button--warning:focus:not(:focus-visible):not(:active) {
+    background-color: #ca3535;
+    box-shadow: 0 2px 0 #651b1b;
+    color: #ffffff;
+}
+
+.app-overview-card--used.govuk-button:focus:not(:focus-visible):not(:active) {
+    background-color: #ffffff;
+    box-shadow: 0 2px 0 #cecece;
+    color: var(--govuk-secondary-text-colour, #484949);
+}
+
+@media (max-width: 40.0525em) {
+    .app-search .govuk-label {
+        font-size: 1rem;
+    }
 }
